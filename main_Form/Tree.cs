@@ -1,0 +1,560 @@
+﻿using Image_processing.Class;
+using Image_processing.form;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static System.Windows.Forms.LinkLabel;
+using System.Windows.Forms;
+using Image_processing.form.滤波;
+using static OpenCvSharp.Stitcher;
+using OpenCvSharp;
+using Image_processing.form.二值化;
+using Image_processing.form.形态学操作;
+using System.Transactions;
+using Image_processing.form.平移旋转;
+
+namespace Image_processing
+{
+    public partial class Main_form
+    {
+        /// <summary>
+        /// 树状图添加节点
+        /// </summary>
+        private void tree_add()
+        {
+            TreeNode[] nodes =
+           {
+                new TreeNode("颜色空间", new[]
+                {
+                    new TreeNode("颜色空间变化") { ToolTipText = "将图像从一种颜色空间转换为另一种颜色空间" }
+                }),
+                new TreeNode("图像滤波", new[]
+                {
+                    new TreeNode("均值滤波") { ToolTipText = "去除噪声和细节，平滑图像" },
+                    new TreeNode("方框滤波") { ToolTipText = "去除噪声和细节，平滑图像" },
+                    new TreeNode("高斯滤波") { ToolTipText = "平滑图像并去除噪声，保留图像的整体结构信息和边缘信息" },
+                    new TreeNode("中值滤波") { ToolTipText = "去除噪声和细节，平滑图像并保留边缘信息" },
+                    new TreeNode("双边滤波") { ToolTipText = "平滑图像并保留边缘信息和细节信息" }
+                }),
+                new TreeNode("图像翻转", new[]
+                {
+                    new TreeNode("上下翻转") { ToolTipText = "将图像上下翻转，可用于镜像图像或纠正拍摄时的倒置问题" },
+                    new TreeNode("左右翻转") { ToolTipText = "将图像左右翻转，可用于镜像图像或纠正拍摄时的倒置问题" },
+                    new TreeNode("全翻转") { ToolTipText = "将图像上下左右翻转，可用于镜像图像或纠正拍摄时的倒置问题" }
+                }),
+                new TreeNode("图像阈值", new[]
+                {
+                    new TreeNode("二值化") { ToolTipText = "将图像根据阈值分成黑白两部分，可用于物体检测、文字识别等任务" },
+                    new TreeNode("自适应阈值") { ToolTipText = "根据图像局部区域内的像素值动态调整阈值，可用于处理光照不均的图像" },
+                    new TreeNode("Otsu算法") { ToolTipText = "根据图像灰度直方图自适应调整阈值，可用于分割目标和背景" }
+                }),
+                new TreeNode("形态学操作", new[]
+                {
+                    new TreeNode("腐蚀") { ToolTipText = "将图像中的前景物体缩小，可用于去除小物体或者分离相邻物体" },
+                    new TreeNode("膨胀") { ToolTipText = "将图像中的前景物体扩大，可用于填充小孔洞或者合并相邻物体" },
+                    new TreeNode("开运算") { ToolTipText = "先进行腐蚀操作，再进行膨胀操作，可用于去除小物体和毛刺" },
+                    new TreeNode("闭运算") { ToolTipText = "先进行膨胀操作，再进行腐蚀操作，填充小孔洞" },
+                    new TreeNode("梯度运算") { ToolTipText = "将膨胀后的图像减去腐蚀后的图像，得到前景物体的边缘轮廓" },
+                    new TreeNode("顶帽运算") { ToolTipText = "将原图像减去开运算后的图像，得到小物体" },
+                    new TreeNode("黑帽运算") { ToolTipText = "将闭运算后的图像减去原图像，得到小孔洞" }
+                 }),
+                new TreeNode("平移旋转",new []
+                {
+                    new TreeNode("平移旋转"){ ToolTipText = "将图像进行旋转平移" }
+                })
+            };
+
+            TreeNode node = new TreeNode("OpenCVsharp", nodes);
+            treeView1.Nodes.Add(node);
+        }
+
+        /// <summary>
+        /// 选择对应的方法
+        /// </summary>
+        /// <param name="e"></param>
+        public void switch_Method(TreeNodeMouseClickEventArgs e)
+        {
+            if (e.Node.Nodes.Count == 0) // 判断是否为子节点
+            {
+                switch (e.Node.Parent.Text)
+                {
+                    case "颜色空间":
+                        switch (e.Node.Text)
+                        {
+                            case "颜色空间变化": color_add("颜色空间变化"); break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case "图像滤波":
+                        switch (e.Node.Text)
+                        {
+                            case "均值滤波": Mean_Filter("均值滤波"); break;
+                            case "方框滤波": Box_Filter("方框滤波"); break;
+                            case "高斯滤波": Gaussian_Blur("高斯滤波"); break;
+                            case "中值滤波": Median_Blur("中值滤波"); break;
+                            case "双边滤波": Bilateral_Filter("双边滤波"); break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case "图像翻转":
+                        switch (e.Node.Text)
+                        {
+                            case "上下翻转": X_axis_flip("上下翻转"); break;
+                            case "左右翻转": Y_axis_flip("左右翻转"); break;
+                            case "全翻转": XY_axis_flip("上下左右都翻转"); break;
+                        }
+                        break;
+                    case "图像阈值":
+                        switch (e.Node.Text)
+                        {
+                            case "二值化": Binarizate("二值化"); break;
+                            case "自适应阈值": AdaptiveThreshold("自适应阈值"); break;
+                            case "Otsu算法": Otsu("Otsu算法"); break;
+                        }
+                        break;
+                    case "形态学操作":
+                        switch (e.Node.Text)
+                        {
+                            case ("腐蚀"): Corrosion("腐蚀"); break;
+                            case ("膨胀"): Expansion("膨胀"); break;
+                            case ("开运算"): Open_operation("开运算"); break;
+                            case ("闭运算"): Close_operation("闭运算"); break;
+                            case ("梯度运算"): Gradient_operation("梯度运算"); break;
+                            case ("顶帽运算"): Top_hat_operation("顶帽运算"); break;
+                            case ("黑帽运算"): Black_hat_operation("黑帽运算"); break;
+                        }
+                        break;
+                    case "平移旋转":
+                        switch (e.Node.Text)
+                        {
+                            case ("平移旋转"): Translation_rotation("平移旋转"); break;
+                        }
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 平移旋转
+        /// </summary>
+        /// <param name="v"></param>
+        private void Translation_rotation(string v)
+        {
+            Translation_rotation translation_rotation = new Translation_rotation("平移旋转");
+            translation_rotation.StartPosition = FormStartPosition.CenterScreen;
+            translation_rotation.ShowDialog();
+            if (translation_rotation.DialogResult == DialogResult.OK)
+            {
+                listBox1.Items.Add(v);
+                del_process Translation_rotation = OpenCV.Translation_rotation;
+                link.AddDelegate(Translation_rotation);
+                form_class.translation_rotation = translation_rotation;
+                textBox1.AppendText(v + "添加成功！！！X平移" + form_class.translation_rotation.Translation_X.ToString() +
+                    ",Y平移" + form_class.translation_rotation.Translation_Y.ToString() +
+                    ",旋转" + form_class.translation_rotation.Rotation.ToString() + "°\r\n");
+            }
+        }
+
+        #region 形态学操作
+        /// <summary>
+        /// 黑帽运算
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void Black_hat_operation(string mode)
+        {
+            Morphological_operation black_hat_operation = new Morphological_operation("黑帽运算");
+            black_hat_operation.StartPosition = FormStartPosition.CenterScreen;
+            black_hat_operation.ShowDialog();
+            if (black_hat_operation.DialogResult == DialogResult.OK)
+            {
+                listBox1.Items.Add(mode);
+                del_process Black_hat_operation = OpenCV.Black_hat_operation;
+                link.AddDelegate(Black_hat_operation);
+                form_class.black_hat_operation = black_hat_operation;
+                textBox1.AppendText(mode + "添加成功！！！核形状为为：" + form_class.black_hat_operation.kernel_shape.ToString() +
+                    ",宽度为：" + form_class.black_hat_operation.kernel_width.ToString() +
+                    ",高度为：" + form_class.black_hat_operation.kernel_height.ToString() + "\r\n");
+            }
+        }
+
+        /// <summary>
+        /// 顶帽运算
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void Top_hat_operation(string mode)
+        {
+            Morphological_operation top_hat_operation = new Morphological_operation("顶帽运算");
+            top_hat_operation.StartPosition = FormStartPosition.CenterScreen;
+            top_hat_operation.ShowDialog();
+            if (top_hat_operation.DialogResult == DialogResult.OK)
+            {
+                listBox1.Items.Add(mode);
+                del_process Top_hat_operation = OpenCV.Top_hat_operation;
+                link.AddDelegate(Top_hat_operation);
+                form_class.top_hat_operation = top_hat_operation;
+                textBox1.AppendText(mode + "添加成功！！！核形状为为：" + form_class.top_hat_operation.kernel_shape.ToString() +
+                    ",宽度为：" + form_class.top_hat_operation.kernel_width.ToString() +
+                    ",高度为：" + form_class.top_hat_operation.kernel_height.ToString() + "\r\n");
+            }
+        }
+
+        /// <summary>
+        /// 梯度运算
+        /// </summary>
+        /// <param name="v"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void Gradient_operation(string mode)
+        {
+            Morphological_operation gradient_operation = new Morphological_operation("梯度运算");
+            gradient_operation.StartPosition = FormStartPosition.CenterScreen;
+            gradient_operation.ShowDialog();
+            if (gradient_operation.DialogResult == DialogResult.OK)
+            {
+                listBox1.Items.Add(mode);
+                del_process Gradient_operation = OpenCV.Gradient_operation;
+                link.AddDelegate(Gradient_operation);
+                form_class.gradient_operation = gradient_operation;
+                textBox1.AppendText(mode + "添加成功！！！核形状为为：" + form_class.gradient_operation.kernel_shape.ToString() +
+                    ",宽度为：" + form_class.gradient_operation.kernel_width.ToString() +
+                    ",高度为：" + form_class.gradient_operation.kernel_height.ToString() + "\r\n");
+            }
+        }
+
+        /// <summary>
+        /// 闭运算
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void Close_operation(string mode)
+        {
+            Morphological_operation close_operation = new Morphological_operation("闭运算");
+            close_operation.StartPosition = FormStartPosition.CenterScreen;
+            close_operation.ShowDialog();
+            if (close_operation.DialogResult == DialogResult.OK)
+            {
+                listBox1.Items.Add(mode);
+                del_process Close_operation = OpenCV.Close_operation;
+                link.AddDelegate(Close_operation);
+                form_class.close_operation = close_operation;
+                textBox1.AppendText(mode + "添加成功！！！核形状为为：" + form_class.close_operation.kernel_shape.ToString() +
+                    ",宽度为：" + form_class.close_operation.kernel_width.ToString() +
+                    ",高度为：" + form_class.close_operation.kernel_height.ToString() + "\r\n");
+            }
+        }
+
+        /// <summary>
+        /// 开运算
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void Open_operation(string mode)
+        {
+            Morphological_operation open_operation = new Morphological_operation("开运算");
+            open_operation.StartPosition = FormStartPosition.CenterScreen;
+            open_operation.ShowDialog();
+            if (open_operation.DialogResult == DialogResult.OK)
+            {
+                listBox1.Items.Add(mode);
+                del_process Open_operation = OpenCV.Open_operation;
+                link.AddDelegate(Open_operation);
+                form_class.open_operation = open_operation;
+                textBox1.AppendText(mode + "添加成功！！！核形状为为：" + form_class.open_operation.kernel_shape.ToString() +
+                    ",宽度为：" + form_class.open_operation.kernel_width.ToString() +
+                    ",高度为：" + form_class.open_operation.kernel_height.ToString() + "\r\n");
+            }
+        }
+
+
+        /// <summary>
+        /// 膨胀
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void Expansion(string mode)
+        {
+            Morphological_operation expansion = new Morphological_operation("膨胀");
+            expansion.StartPosition = FormStartPosition.CenterScreen;
+            expansion.ShowDialog();
+            if (expansion.DialogResult == DialogResult.OK)
+            {
+                listBox1.Items.Add(mode);
+                del_process Expansion = OpenCV.Expansion;
+                link.AddDelegate(Expansion);
+                form_class.expansion = expansion;
+                textBox1.AppendText(mode + "添加成功！！！核形状为为：" + form_class.expansion.kernel_shape.ToString() +
+                    ",宽度为：" + form_class.expansion.kernel_width.ToString() +
+                    ",高度为：" + form_class.expansion.kernel_height.ToString() + "\r\n");
+            }
+        }
+
+        /// <summary>
+        /// 腐蚀操作
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void Corrosion(string mode)
+        {
+            Morphological_operation corrosion = new Morphological_operation("腐蚀操作");
+            corrosion.StartPosition = FormStartPosition.CenterScreen;
+            corrosion.ShowDialog();
+            if (corrosion.DialogResult == DialogResult.OK)
+            {
+                listBox1.Items.Add(mode);
+                del_process Corrosion = OpenCV.Corrosion;
+                link.AddDelegate(Corrosion);
+                form_class.corrosion = corrosion;
+                textBox1.AppendText(mode + "添加成功！！！核形状为为：" + form_class.corrosion.kernel_shape.ToString() +
+                    ",宽度为：" + form_class.corrosion.kernel_width.ToString() +
+                    ",高度为：" + form_class.corrosion.kernel_height.ToString() + "\r\n");
+            }
+        }
+        #endregion
+
+        #region 图像阈值操作
+        /// <summary>
+        /// OTsu算法
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void Otsu(string mode)
+        {
+            Otsu Otsu = new Otsu(mode);
+            Otsu.StartPosition = FormStartPosition.CenterScreen;
+            Otsu.ShowDialog();
+            if (Otsu.DialogResult == DialogResult.OK)
+            {
+                listBox1.Items.Add(mode);
+                del_process otsu = OpenCV.Otsu;
+                link.AddDelegate(otsu);
+                form_class.otsu = Otsu;
+                textBox1.AppendText(mode + "添加成功！！！模式为：" + form_class.otsu.Binarization_mode.ToString() + "\r\n");
+            }
+        }
+
+
+        /// <summary>
+        /// 自适应阈值
+        /// </summary>
+        /// <param name="mode"></param>
+        private void AdaptiveThreshold(string mode)
+        {
+            Adaptive_Threshold adaptivethreshold = new Adaptive_Threshold();
+            adaptivethreshold.StartPosition = FormStartPosition.CenterScreen;
+            adaptivethreshold.ShowDialog();
+            if (adaptivethreshold.DialogResult == DialogResult.OK)
+            {
+                listBox1.Items.Add(mode);
+                del_process AdaptiveThreshold = OpenCV.AdaptiveThreshold;
+                link.AddDelegate(AdaptiveThreshold);
+                form_class.adaptive_Threshold = adaptivethreshold;
+                textBox1.AppendText(mode + "添加成功！！！自适应阈值算法为：" + form_class.adaptive_Threshold.Adaptive_Types.ToString() +
+                    ",模式为：" + form_class.adaptive_Threshold.Threshold_Types.ToString() + "\r\n");
+            }
+        }
+
+        /// <summary>
+        /// 二值化
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void Binarizate(string mode)
+        {
+            Binarization binarization = new Binarization("二值化");
+            binarization.StartPosition = FormStartPosition.CenterScreen;
+            binarization.ShowDialog();
+            if (binarization.DialogResult == DialogResult.OK)
+            {
+                listBox1.Items.Add(mode);
+                del_process ToBinary = OpenCV.ToBinary;
+                link.AddDelegate(ToBinary);
+                form_class.binarization = binarization;
+                textBox1.AppendText(mode + "添加成功！！！阈值为：" + form_class.binarization.Threshold.ToString() +
+                    ",模式为：" + form_class.binarization.Binarization_mode.ToString() + "\r\n");
+            }
+        }
+
+        #endregion
+
+        #region 图像翻转
+        /// <summary>
+        /// 上下左右都翻转
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void XY_axis_flip(string mode)
+        {
+            listBox1.Items.Add(mode);
+            del_process XY_Flip = OpenCV.XY_Flip;
+            link.AddDelegate(XY_Flip);
+            form_class.xy_flipMode = FlipMode.XY;
+            textBox1.AppendText(mode + "\r\n");
+        }
+
+
+        /// <summary>
+        /// 左右翻转
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void Y_axis_flip(string mode)
+        {
+            listBox1.Items.Add(mode);
+            del_process Y_Flip = OpenCV.Y_Flip;
+            link.AddDelegate(Y_Flip);
+            form_class.y_flipMode = FlipMode.Y;
+            textBox1.AppendText(mode + "\r\n");
+        }
+
+
+        /// <summary>
+        /// 上下翻转
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void X_axis_flip(string mode)
+        {
+            listBox1.Items.Add(mode);
+            del_process X_Flip = OpenCV.X_Flip;
+            link.AddDelegate(X_Flip);
+            form_class.x_flipMode = FlipMode.X;
+            textBox1.AppendText(mode + "\r\n");
+        }
+
+        #endregion
+
+        #region 滤波
+
+        /// <summary>
+        /// 双边滤波
+        /// </summary>
+        /// <param name="v"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void Bilateral_Filter(string mode)
+        {
+            Bilateral_Filter bilateral_Filter = new Bilateral_Filter();
+            bilateral_Filter.StartPosition = FormStartPosition.CenterScreen;
+            bilateral_Filter.ShowDialog();
+            if (bilateral_Filter.DialogResult == DialogResult.OK)
+            {
+                listBox1.Items.Add(mode);
+                del_process Bilateral_Filter = OpenCV.Bilateral_Filter;
+                link.AddDelegate(Bilateral_Filter);
+                form_class.bilateral_filter = bilateral_Filter;
+                textBox1.AppendText(mode + "添加成功！！！sigmaColor为：" + form_class.bilateral_filter.SigmaColor.ToString() +
+                    ",SigmaSpace：" + form_class.bilateral_filter.SigmaSpace.ToString() + "\r\n");
+            }
+        }
+
+        /// <summary>
+        /// 中值滤波
+        /// </summary>
+        /// <param name="v"></param>
+        private void Median_Blur(string mode)
+        {
+            Filtering median_Blur = new Filtering(Filtering.模式.奇数, new Filtering.Scope { min = 1, max = 50 }, mode);
+            median_Blur.StartPosition = FormStartPosition.CenterScreen;
+            median_Blur.ShowDialog();
+            if (median_Blur.DialogResult == DialogResult.OK)
+            {
+                listBox1.Items.Add(mode);
+                del_process Median_Blur = OpenCV.Median_Blur;
+                link.AddDelegate(Median_Blur);
+                form_class.median_Blur = median_Blur;
+                textBox1.AppendText(mode + "添加成功！！！核大小为：" + form_class.median_Blur.Value.ToString() + "\r\n");
+            }
+        }
+
+        /// <summary>
+        /// 均值滤波
+        /// </summary>
+        void Mean_Filter(string mode)
+        {
+            Filtering mean_filter = new Filtering(Filtering.模式.奇数, new Filtering.Scope { min = 1, max = 50 }, mode);
+            mean_filter.StartPosition = FormStartPosition.CenterScreen;
+            mean_filter.ShowDialog();
+            if (mean_filter.DialogResult == DialogResult.OK)
+            {
+                listBox1.Items.Add(mode);
+                del_process medianBlur = OpenCV.medianBlur;
+                link.AddDelegate(medianBlur);
+                form_class.mean_filter = mean_filter;
+                textBox1.AppendText(mode + "添加成功！！！核大小为：" + form_class.mean_filter.Value.ToString() + "\r\n");
+            }
+
+        }
+
+        /// <summary>
+        /// 方框滤波
+        /// </summary>
+        /// <param name="mode"></param>
+        void Box_Filter(string mode)
+        {
+            Filtering box_filter = new Filtering(Filtering.模式.无, new Filtering.Scope { min = 1, max = 50 }, mode);
+            box_filter.StartPosition = FormStartPosition.CenterScreen;
+            box_filter.ShowDialog();
+            if (box_filter.DialogResult == DialogResult.OK)
+            {
+                listBox1.Items.Add(mode);
+                del_process boxFilter = OpenCV.boxFilter;
+                link.AddDelegate(boxFilter);
+                form_class.box_filter = box_filter;
+                textBox1.AppendText(mode + "添加成功！！！核大小为：" + form_class.box_filter.Value.ToString() + "\r\n");
+            }
+        }
+
+        /// <summary>
+        /// 高斯滤波
+        /// </summary>
+        /// <param name="v"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void Gaussian_Blur(string mode)
+        {
+            Filtering gaussian_Blur = new Filtering(Filtering.模式.奇数, new Filtering.Scope { min = 1, max = 50 }, mode);
+            gaussian_Blur.StartPosition = FormStartPosition.CenterScreen;
+            gaussian_Blur.ShowDialog();
+            if (gaussian_Blur.DialogResult == DialogResult.OK)
+            {
+                listBox1.Items.Add(mode);
+                del_process Gaussian_Blur = OpenCV.Gaussian_Blur;
+                link.AddDelegate(Gaussian_Blur);
+                form_class.gaussian_Blur = gaussian_Blur;
+                textBox1.AppendText(mode + "添加成功！！！核大小为：" + form_class.gaussian_Blur.Value.ToString() + "\r\n");
+            }
+        }
+
+        #endregion
+
+        #region 颜色空间变化
+
+        /// <summary>
+        /// 颜色变换
+        /// </summary>
+        /// 
+        void color_add(string mode)
+        {
+            colorTo colorto = new colorTo();
+            colorto.StartPosition = FormStartPosition.CenterScreen;
+            colorto.ShowDialog();
+            if (colorto.DialogResult == DialogResult.OK)
+            {
+                listBox1.Items.Add(mode);
+                del_process tocolor = OpenCV.colorto;
+                link.AddDelegate(tocolor);
+                form_class.colorTo = colorto;
+                textBox1.AppendText("颜色空间变化添加成功！！！图片处理为：" + form_class.colorTo.ColorCode.ToString() + "\r\n");
+            }
+            else
+            {
+                form_class.colorTo = null;
+                return;
+            }
+        }
+        #endregion
+    }
+}
