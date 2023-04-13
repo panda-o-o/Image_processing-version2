@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OpenCvSharp;
 
 namespace Image_processing.Class
 {
-    public static class Data
+    public static class Data_List
     {
-       static Dictionary<string,int> data_dic=new Dictionary<string, int>();
-       static List<Dictionary<string, int>> data_list= new List<Dictionary<string, int>>();
+        static List<Data> data_list = new List<Data>();
+    }
+    public class Data
+    {
+        static Dictionary<string, int> int_dic = new Dictionary<string, int>();
+        static Dictionary<string, Mat> mat_dic = new Dictionary<string, Mat>();
     }
 }
+
