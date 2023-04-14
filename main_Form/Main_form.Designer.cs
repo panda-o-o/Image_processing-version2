@@ -134,19 +134,19 @@
             // 
             listbox_MenuStrip.Items.AddRange(new ToolStripItem[] { 插入ToolStripMenuItem, 删除ToolStripMenuItem });
             listbox_MenuStrip.Name = "listbox_MenuStrip1";
-            listbox_MenuStrip.Size = new Size(181, 70);
+            listbox_MenuStrip.Size = new Size(101, 48);
             // 
             // 插入ToolStripMenuItem
             // 
             插入ToolStripMenuItem.Name = "插入ToolStripMenuItem";
-            插入ToolStripMenuItem.Size = new Size(180, 22);
+            插入ToolStripMenuItem.Size = new Size(100, 22);
             插入ToolStripMenuItem.Text = "插入";
             插入ToolStripMenuItem.Click += 插入ToolStripMenuItem_Click;
             // 
             // 删除ToolStripMenuItem
             // 
             删除ToolStripMenuItem.Name = "删除ToolStripMenuItem";
-            删除ToolStripMenuItem.Size = new Size(180, 22);
+            删除ToolStripMenuItem.Size = new Size(100, 22);
             删除ToolStripMenuItem.Text = "删除";
             删除ToolStripMenuItem.Click += 删除ToolStripMenuItem_Click;
             // 

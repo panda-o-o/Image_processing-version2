@@ -21,7 +21,6 @@ namespace Image_processing
         public linked_list link;
         public Mat img;
         public Mat mask;
-        public form_class form_Class;
         public static Mat mat;//图片处理备份
 
         #region 窗体加载
@@ -33,7 +32,6 @@ namespace Image_processing
             img = new Mat();
             mask = new Mat();
             mat = new Mat();
-            form_Class = new form_class();
 
         }
 

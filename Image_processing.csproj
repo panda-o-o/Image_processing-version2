@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <EmbeddedResource Remove="main_Form\List.resx" />
+    <EmbeddedResource Remove="main_Form\Main_form.resx" />
     <EmbeddedResource Remove="main_Form\Tree.resx" />
   </ItemGroup>
 
