@@ -1,4 +1,5 @@
-﻿using OpenCvSharp;
+﻿using Image_processing.Class;
+using OpenCvSharp;
 using Sunny.UI.Win32;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -22,7 +23,7 @@ namespace Image_processing
             try { bitmap = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(mat); } catch { return null; }
 
 
-            // 如果图像格式不是 24 位 RGB，则需要转换为 24 位 RGB 格式
+            // 如果图像格式不是 24 位 RGB,则需要转换为 24 位 RGB 格式
             if (bitmap.PixelFormat != PixelFormat.Format24bppRgb)
             {
                 Bitmap newBitmap = new Bitmap(bitmap.Width, bitmap.Height, PixelFormat.Format24bppRgb);
@@ -42,12 +43,10 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void colorto(ref Mat img, ref Mat mask)
+        public static void colorto(ref Mat img, ref Mat mask, ref int count)
         {
-#pragma warning disable CS8602 // 解引用可能出现空引用。
-            Cv2.CvtColor(img, img, form_class.colorTo.ColorCode);
-#pragma warning restore CS8602 // 解引用可能出现空引用。
-
+            var ColorCode = Data_List.data_list[count++].int_dic["ColorCode"];
+            Cv2.CvtColor(img, img, (ColorConversionCodes)ColorCode);
 
         }
 
@@ -56,9 +55,10 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void medianBlur(ref Mat img, ref Mat mask)
+        public static void medianBlur(ref Mat img, ref Mat mask, ref int count)
         {
-            Cv2.MedianBlur(img, img, form_class.mean_filter.Value);
+            var size = Data_List.data_list[count++].int_dic["size"];
+            Cv2.MedianBlur(img, img, size);
         }
 
         /// <summary>
@@ -66,9 +66,10 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void boxFilter(ref Mat img, ref Mat mask)
+        public static void boxFilter(ref Mat img, ref Mat mask, ref int count)
         {
-            Cv2.BoxFilter(img, img, -1, new OpenCvSharp.Size(form_class.mean_filter.Value, form_class.mean_filter.Value));
+            var size = Data_List.data_list[count++].int_dic["size"];
+            Cv2.BoxFilter(img, img, -1, new OpenCvSharp.Size(size, size));
         }
 
         /// <summary>
@@ -76,9 +77,10 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void Gaussian_Blur(ref Mat img, ref Mat mask)
+        public static void Gaussian_Blur(ref Mat img, ref Mat mask, ref int count)
         {
-            Cv2.GaussianBlur(img, img, new OpenCvSharp.Size(form_class.gaussian_Blur.Value, form_class.gaussian_Blur.Value), 0);
+            var size = Data_List.data_list[count++].int_dic["size"];
+            Cv2.GaussianBlur(img, img, new OpenCvSharp.Size(size, size), 0);
         }
 
         /// <summary>
@@ -86,9 +88,10 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void Median_Blur(ref Mat img, ref Mat mask)
+        public static void Median_Blur(ref Mat img, ref Mat mask, ref int count)
         {
-            Cv2.MedianBlur(img, img, form_class.median_Blur.Value);
+            var size = Data_List.data_list[count++].int_dic["size"];
+            Cv2.MedianBlur(img, img, size);
         }
 
         /// <summary>
@@ -96,10 +99,12 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void Bilateral_Filter(ref Mat img, ref Mat mask)
+        public static void Bilateral_Filter(ref Mat img, ref Mat mask, ref int count)
         {
             Mat temp = new Mat();
-            Cv2.BilateralFilter(img, temp, -1, form_class.bilateral_filter.SigmaColor, form_class.bilateral_filter.SigmaSpace);
+            var SigmaColor = Data_List.data_list[count].dou_dic["SigmaColor"];
+            var SigmaSpace = Data_List.data_list[count++].dou_dic["SigmaSpace"];
+            Cv2.BilateralFilter(img, temp, -1, SigmaColor, SigmaSpace);
             img = temp.Clone();
         }
 
@@ -108,9 +113,10 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void X_Flip(ref Mat img, ref Mat mask)
+        public static void X_Flip(ref Mat img, ref Mat mask, ref int count)
         {
-            Cv2.Flip(img, img, form_class.x_flipMode);
+            var flip = Data_List.data_list[count++].int_dic["Flip"];
+            Cv2.Flip(img, img, (FlipMode)flip);
         }
 
         /// <summary>
@@ -118,9 +124,10 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void Y_Flip(ref Mat img, ref Mat mask)
+        public static void Y_Flip(ref Mat img, ref Mat mask, ref int count)
         {
-            Cv2.Flip(img, img, form_class.y_flipMode);
+            var flip = Data_List.data_list[count++].int_dic["Flip"];
+            Cv2.Flip(img, img, (FlipMode)flip);
         }
 
         /// <summary>
@@ -128,9 +135,10 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void XY_Flip(ref Mat img, ref Mat mask)
+        public static void XY_Flip(ref Mat img, ref Mat mask, ref int count)
         {
-            Cv2.Flip(img, img, form_class.xy_flipMode);
+            var flip = Data_List.data_list[count++].int_dic["Flip"];
+            Cv2.Flip(img, img, (FlipMode)flip);
         }
 
         /// <summary>
@@ -138,14 +146,16 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void ToBinary(ref Mat img, ref Mat mask)
+        public static void ToBinary(ref Mat img, ref Mat mask, ref int count)
         {
-            if (form_class.binarization.Threshold <= 0)
+            var Threshold = Data_List.data_list[count].int_dic["Threshold"];
+            var Binarization_mode = Data_List.data_list[count++].int_dic["Binarization_mode"];
+            if (Threshold <= 0)
             {
                 Scalar scalar = Cv2.Mean(img);
-                form_class.binarization.Threshold = (int)scalar.Val0;
+                Threshold = (int)scalar.Val0;
             }
-            Cv2.Threshold(img, img, form_class.binarization.Threshold, 255, form_class.binarization.Binarization_mode);//二值化
+            Cv2.Threshold(img, img, Threshold, 255, (ThresholdTypes)Binarization_mode);//二值化
         }
 
         /// <summary>
@@ -153,10 +163,11 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void AdaptiveThreshold(ref Mat img, ref Mat mask)
+        public static void AdaptiveThreshold(ref Mat img, ref Mat mask, ref int count)
         {
-
-            Cv2.AdaptiveThreshold(img, img, 255, form_class.adaptive_Threshold.Adaptive_Types, form_class.adaptive_Threshold.Threshold_Types, 5, 3);
+            var Adaptive_Types = Data_List.data_list[count].int_dic["Adaptive_Types"];
+            var Threshold_Types = Data_List.data_list[count++].int_dic["Threshold_Types"];
+            Cv2.AdaptiveThreshold(img, img, 255, (AdaptiveThresholdTypes)Adaptive_Types, (ThresholdTypes)Threshold_Types, 5, 3);
 
         }
 
@@ -165,9 +176,10 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void Otsu(ref Mat img, ref Mat mask)
+        public static void Otsu(ref Mat img, ref Mat mask, ref int count)
         {
-            Cv2.Threshold(img, img, 0, 255, ThresholdTypes.Otsu | form_class.otsu.Binarization_mode);//二值化
+            var Binarization_mode = Data_List.data_list[count++].int_dic["Binarization_mode"];
+            Cv2.Threshold(img, img, 0, 255, ThresholdTypes.Otsu | (ThresholdTypes)Binarization_mode);//二值化
         }
 
         /// <summary>
@@ -175,11 +187,10 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void Corrosion(ref Mat img, ref Mat mask)
+        public static void Corrosion(ref Mat img, ref Mat mask, ref int count)
         {
-            Mat kernel = Cv2.GetStructuringElement(form_class.corrosion.kernel_shape, new Size(form_class.corrosion.kernel_width,
-                form_class.corrosion.kernel_height));
-            Cv2.MorphologyEx(img, img, MorphTypes.Erode, kernel);
+            var Kernel= Data_List.data_list[count++].mat_dic["Kernel"];
+            Cv2.MorphologyEx(img, img, MorphTypes.Erode, Kernel);
         }
 
         /// <summary>
@@ -187,11 +198,10 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void Expansion(ref Mat img, ref Mat mask)
+        public static void Expansion(ref Mat img, ref Mat mask, ref int count)
         {
-            Mat kernel = Cv2.GetStructuringElement(form_class.expansion.kernel_shape, new Size(form_class.expansion.kernel_width,
-                form_class.expansion.kernel_height));
-            Cv2.MorphologyEx(img, img, MorphTypes.Dilate, kernel);
+            var Kernel = Data_List.data_list[count++].mat_dic["Kernel"];
+            Cv2.MorphologyEx(img, img, MorphTypes.Dilate, Kernel);
         }
 
         /// <summary>
@@ -199,11 +209,10 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void Open_operation(ref Mat img, ref Mat mask)
+        public static void Open_operation(ref Mat img, ref Mat mask, ref int count)
         {
-            Mat kernel = Cv2.GetStructuringElement(form_class.open_operation.kernel_shape, new Size(form_class.open_operation.kernel_width,
-                form_class.open_operation.kernel_height));
-            Cv2.MorphologyEx(img, img, MorphTypes.Open, kernel);
+            var Kernel = Data_List.data_list[count++].mat_dic["Kernel"];
+            Cv2.MorphologyEx(img, img, MorphTypes.Open, Kernel);
         }
 
         /// <summary>
@@ -211,11 +220,10 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void Close_operation(ref Mat img, ref Mat mask)
+        public static void Close_operation(ref Mat img, ref Mat mask, ref int count)
         {
-            Mat kernel = Cv2.GetStructuringElement(form_class.close_operation.kernel_shape, new Size(form_class.close_operation.kernel_width,
-                form_class.close_operation.kernel_height));
-            Cv2.MorphologyEx(img, img, MorphTypes.Close, kernel);
+            var Kernel = Data_List.data_list[count++].mat_dic["Kernel"];
+            Cv2.MorphologyEx(img, img, MorphTypes.Close, Kernel);
         }
 
         /// <summary>
@@ -223,11 +231,10 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void Gradient_operation(ref Mat img, ref Mat mask)
+        public static void Gradient_operation(ref Mat img, ref Mat mask, ref int count)
         {
-            Mat kernel = Cv2.GetStructuringElement(form_class.gradient_operation.kernel_shape, new Size(form_class.gradient_operation.kernel_width,
-                form_class.gradient_operation.kernel_height));
-            Cv2.MorphologyEx(img, img, MorphTypes.Gradient, kernel);
+            var Kernel = Data_List.data_list[count++].mat_dic["Kernel"];
+            Cv2.MorphologyEx(img, img, MorphTypes.Gradient, Kernel);
         }
 
         /// <summary>
@@ -235,11 +242,10 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void Top_hat_operation(ref Mat img, ref Mat mask)
+        public static void Top_hat_operation(ref Mat img, ref Mat mask, ref int count)
         {
-            Mat kernel = Cv2.GetStructuringElement(form_class.top_hat_operation.kernel_shape, new Size(form_class.top_hat_operation.kernel_width,
-                form_class.top_hat_operation.kernel_height));
-            Cv2.MorphologyEx(img, img, MorphTypes.TopHat, kernel);
+            var Kernel = Data_List.data_list[count++].mat_dic["Kernel"];
+            Cv2.MorphologyEx(img, img, MorphTypes.TopHat, Kernel);
         }
 
         /// <summary>
@@ -247,23 +253,25 @@ namespace Image_processing
         /// </summary>
         /// <param name="img"></param>
         /// <param name="mask"></param>
-        public static void Black_hat_operation(ref Mat img, ref Mat mask)
+        public static void Black_hat_operation(ref Mat img, ref Mat mask, ref int count)
         {
-            Mat kernel = Cv2.GetStructuringElement(form_class.black_hat_operation.kernel_shape, new Size(form_class.black_hat_operation.kernel_width,
-                form_class.black_hat_operation.kernel_height));
-            Cv2.MorphologyEx(img, img, MorphTypes.BlackHat, kernel);
+           var Kernel= Data_List.data_list[count++].mat_dic["Kernel"];
+            Cv2.MorphologyEx(img, img, MorphTypes.BlackHat, Kernel);
         }
 
 
-        public static void Translation_rotation(ref Mat img, ref Mat mask)
+        public static void Translation_rotation(ref Mat img, ref Mat mask, ref int count)
         {
-            if (!form_class.translation_rotation.translation_M.Empty())
+
+            var translation_M = Data_List.data_list[count].mat_dic["translation_M"];
+            var rotation_M = Data_List.data_list[count++].mat_dic["rotation_M"];
+            if (!translation_M.Empty())
             {
-                Cv2.WarpAffine(img, img, form_class.translation_rotation.translation_M, img.Size());
+                Cv2.WarpAffine(img, img, translation_M, img.Size());
             }
-            if (!form_class.translation_rotation.rotation_M.Empty())
+            if (!rotation_M.Empty())
             {
-                Cv2.WarpAffine(img, img, form_class.translation_rotation.rotation_M, img.Size());
+                Cv2.WarpAffine(img, img, rotation_M, img.Size());
             }
         }
     }

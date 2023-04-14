@@ -39,7 +39,6 @@
             listBox1 = new ListBox();
             listbox_MenuStrip = new ContextMenuStrip(components);
             插入ToolStripMenuItem = new ToolStripMenuItem();
-            下方插入ToolStripMenuItem = new ToolStripMenuItem();
             删除ToolStripMenuItem = new ToolStripMenuItem();
             textBox1 = new TextBox();
             statusStrip1 = new StatusStrip();
@@ -133,28 +132,21 @@
             // 
             // listbox_MenuStrip
             // 
-            listbox_MenuStrip.Items.AddRange(new ToolStripItem[] { 插入ToolStripMenuItem, 下方插入ToolStripMenuItem, 删除ToolStripMenuItem });
+            listbox_MenuStrip.Items.AddRange(new ToolStripItem[] { 插入ToolStripMenuItem, 删除ToolStripMenuItem });
             listbox_MenuStrip.Name = "listbox_MenuStrip1";
-            listbox_MenuStrip.Size = new Size(125, 70);
+            listbox_MenuStrip.Size = new Size(181, 70);
             // 
             // 插入ToolStripMenuItem
             // 
             插入ToolStripMenuItem.Name = "插入ToolStripMenuItem";
-            插入ToolStripMenuItem.Size = new Size(124, 22);
-            插入ToolStripMenuItem.Text = "上方插入";
-            插入ToolStripMenuItem.Click += 上方插入ToolStripMenuItem_Click;
-            // 
-            // 下方插入ToolStripMenuItem
-            // 
-            下方插入ToolStripMenuItem.Name = "下方插入ToolStripMenuItem";
-            下方插入ToolStripMenuItem.Size = new Size(124, 22);
-            下方插入ToolStripMenuItem.Text = "下方插入";
-            下方插入ToolStripMenuItem.Click += 下方插入ToolStripMenuItem_Click;
+            插入ToolStripMenuItem.Size = new Size(180, 22);
+            插入ToolStripMenuItem.Text = "插入";
+            插入ToolStripMenuItem.Click += 插入ToolStripMenuItem_Click;
             // 
             // 删除ToolStripMenuItem
             // 
             删除ToolStripMenuItem.Name = "删除ToolStripMenuItem";
-            删除ToolStripMenuItem.Size = new Size(124, 22);
+            删除ToolStripMenuItem.Size = new Size(180, 22);
             删除ToolStripMenuItem.Text = "删除";
             删除ToolStripMenuItem.Click += 删除ToolStripMenuItem_Click;
             // 
@@ -330,6 +322,5 @@
         private Sunny.UI.UIButton open_pic;
         private Sunny.UI.UIWaitingBar uiWaitingBar1;
         private ToolStripMenuItem 插入ToolStripMenuItem;
-        private ToolStripMenuItem 下方插入ToolStripMenuItem;
     }
 }

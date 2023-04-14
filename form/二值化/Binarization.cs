@@ -31,12 +31,12 @@ namespace Image_processing.form.二值化
         Dictionary<string, ThresholdTypes>? dic;
         private void Binarization_Load(object sender, EventArgs e)
         {
-            uiRichTextBox1.Text = "Binary: 将像素值大于阈值的部分设置为最大值，其余部分设置为0\r\n" +
-                "BinaryInv: 将像素值小于阈值的部分设置为最大值，其余部分设置为0\r\n" +
-                "Trunc: 将像素值大于阈值的部分设置为阈值，其余部分不变\r\n" +
-                "ToZero: 将像素值小于阈值的部分设置为0，其余部分不变\r\n" +
-                "ToZeroInv: 将像素值大于阈值的部分设置为0，其余部分不变\r\n\r\n" +
-                "当阈值为0的时候，阈值为图像平均值";
+            uiRichTextBox1.Text = "Binary: 将像素值大于阈值的部分设置为最大值,其余部分设置为0\r\n" +
+                "BinaryInv: 将像素值小于阈值的部分设置为最大值,其余部分设置为0\r\n" +
+                "Trunc: 将像素值大于阈值的部分设置为阈值,其余部分不变\r\n" +
+                "ToZero: 将像素值小于阈值的部分设置为0,其余部分不变\r\n" +
+                "ToZeroInv: 将像素值大于阈值的部分设置为0,其余部分不变\r\n\r\n" +
+                "当阈值为0的时候,阈值为图像平均值";
             dic = new();
             dic.TryAdd("Binary", ThresholdTypes.Binary);
             dic.TryAdd("BinaryInv", ThresholdTypes.BinaryInv);

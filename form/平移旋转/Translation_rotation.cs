@@ -1,4 +1,5 @@
-﻿using OpenCvSharp;
+﻿using Image_processing.Class;
+using OpenCvSharp;
 using Sunny.UI;
 using System;
 using System.Collections.Generic;
@@ -22,12 +23,6 @@ namespace Image_processing.form.平移旋转
         {
             InitializeComponent();
             this.Text = mode;
-            if (mode== "平移旋转修改")
-            {
-                X.Value = form_class.translation_rotation.Translation_X;
-                Y.Value = form_class.translation_rotation.Translation_Y;
-                rotation.Value= form_class.translation_rotation.Rotation;
-            }
         }
 
         public int Translation_X { get; set; }

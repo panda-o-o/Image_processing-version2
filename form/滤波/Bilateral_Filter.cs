@@ -32,8 +32,8 @@ namespace Image_processing.form.滤波
         {
             this.KeyPreview = true; // 启用快捷键
             this.KeyDown += new KeyEventHandler(Bilateral_Filter_KeyDown); // 绑定按键事件
-            uiRichTextBox1.Text = "sigmaColor：颜色空间滤波器的sigma值。这个参数的值越大，就表明该像素邻域内有更宽广的颜色会被混合到一起，产生较大的半相等颜色区域。\r\n" +
-                "sigmaSpace：坐标空间中滤波器的sigma值，坐标空间的标注方差。他的数值越大，意味着越远的像素会相互影响，从而使更大的区域足够相似的颜色获取相同的颜色。";
+            uiRichTextBox1.Text = "sigmaColor：颜色空间滤波器的sigma值。这个参数的值越大,就表明该像素邻域内有更宽广的颜色会被混合到一起,产生较大的半相等颜色区域。\r\n" +
+                "sigmaSpace：坐标空间中滤波器的sigma值,坐标空间的标注方差。他的数值越大,意味着越远的像素会相互影响,从而使更大的区域足够相似的颜色获取相同的颜色。";
             string[] keyword = { "sigmaColor", "sigmaSpace" };
             foreach (string s in keyword)
             {

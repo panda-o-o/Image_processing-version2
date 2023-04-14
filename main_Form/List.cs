@@ -4,13 +4,7 @@ using Image_processing.form.二值化;
 using Image_processing.form.平移旋转;
 using Image_processing.form.形态学操作;
 using Image_processing.form.滤波;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static OpenCvSharp.Stitcher;
+using OpenCvSharp;
 
 namespace Image_processing
 {
@@ -20,33 +14,88 @@ namespace Image_processing
         {
 #pragma warning disable CS8602 // 解引用可能出现空引用。
             string? list = listBox1.SelectedItem.ToString();
-            change_set_parameter(list);
+            change_set_parameter(list, "修改", listBox1.SelectedIndex);
         }
 
-        private void change_set_parameter(string? list)
+        private void change_set_parameter(string? list, string mode, int index)
         {
             switch (list)
             {
-                case "颜色空间变化": change_color(); break;
-                case "均值滤波": change_Mean_filtering("均值滤波"); break;
-                case "方框滤波": change_box_filtering("方框滤波"); break;
-                case "高斯滤波": change_gaussian_blur("高斯滤波"); break;
-                case "中值滤波": change_median_blur("高斯滤波"); break;
-                case "双边滤波": change_bilateral_filter("双边滤波"); break;
-                case "二值化": change_binarization("二值化"); break;
-                case "自适应阈值": change_adaptivethreshold("自适应阈值"); break;
-                case "Otsu算法": change_Otsu("Otsu算法"); break;
-                case ("腐蚀"): change_corrosion("腐蚀"); break;
-                case ("膨胀"): change_expansion("膨胀"); break;
-                case ("开运算"): change_open_operation("开运算"); break;
-                case ("闭运算"): change_close_operation("闭运算"); break;
-                case ("梯度运算"): change_gradient_operation("梯度运算"); break;
-                case ("顶帽运算"): change_top_hat_operation("顶帽运算"); break;
-                case ("黑帽运算"): change_black_hat_operation("黑帽运算"); break;
-                case ("平移旋转"): change_translation_rotation("平移旋转"); break;
+                case "颜色空间变化": change_color("颜色空间", mode, index); break;
+                case "均值滤波": change_Mean_filtering("均值滤波", mode, index); break;
+                case "方框滤波": change_box_filtering("方框滤波", mode, index); break;
+                case "高斯滤波": change_gaussian_blur("高斯滤波", mode, index); break;
+                case "中值滤波": change_median_blur("中值滤波", mode, index); break;
+                case "双边滤波": change_bilateral_filter("双边滤波", mode, index); break;
+                case "上下翻转": change_x_axis_flip("双边滤波", mode, index); break;
+                case "左右翻转": change_y_axis_flip("双边滤波", mode, index); break;
+                case "全翻转": change_xy_axis_flip("双边滤波", mode, index); break;
+                case "二值化": change_binarization("二值化", mode, index); break;
+                case "自适应阈值": change_adaptivethreshold("自适应阈值", mode, index); break;
+                case "Otsu算法": change_Otsu("Otsu算法", mode, index); break;
+                case ("腐蚀"): change_corrosion("腐蚀", mode, index); break;
+                case ("膨胀"): change_expansion("膨胀", mode, index); break;
+                case ("开运算"): change_open_operation("开运算", mode, index); break;
+                case ("闭运算"): change_close_operation("闭运算", mode, index); break;
+                case ("梯度运算"): change_gradient_operation("梯度运算", mode, index); break;
+                case ("顶帽运算"): change_top_hat_operation("顶帽运算", mode, index); break;
+                case ("黑帽运算"): change_black_hat_operation("黑帽运算", mode, index); break;
+                case ("平移旋转"): change_translation_rotation("平移旋转", mode, index); break;
                 default:
                     // Handle the case where the element is not of any expected type
                     break;
+            }
+        }
+
+        private void change_xy_axis_flip(string v, string mode, int index)
+        {
+            if (mode == "修改")
+            {
+                MessageBox.Show("这只能删除，不能修改", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else if (mode == "插入")
+            {
+                Data_dic data = new Data_dic
+                {
+                    int_dic = new Dictionary<string, int>() { { "Flip", (int)FlipMode.XY } }
+                };
+                Data_List.data_list.Insert(index, data);
+                textBox1.AppendText(v + mode + "\r\n");
+            }
+
+        }
+
+        private void change_y_axis_flip(string v, string mode, int index)
+        {
+            if (mode == "修改")
+            {
+                MessageBox.Show("这只能删除，不能修改", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else if (mode == "插入")
+            {
+                Data_dic data = new Data_dic
+                {
+                    int_dic = new Dictionary<string, int>() { { "Flip", (int)FlipMode.Y } }
+                };
+                Data_List.data_list.Insert(index, data);
+                textBox1.AppendText(v + mode + "\r\n");
+            }
+        }
+
+        private void change_x_axis_flip(string v, string mode, int index)
+        {
+            if (mode == "修改")
+            {
+                MessageBox.Show("这只能删除，不能修改", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else if (mode == "插入")
+            {
+                Data_dic data = new Data_dic
+                {
+                    int_dic = new Dictionary<string, int>() { { "Flip", (int)FlipMode.X } }
+                };
+                Data_List.data_list.Insert(index, data);
+                textBox1.AppendText(v + mode + "\r\n");
             }
         }
 
@@ -54,17 +103,29 @@ namespace Image_processing
         /// 平移旋转参数改变
         /// </summary>
         /// <param name="v"></param>
-        private void change_translation_rotation(string v)
+        private void change_translation_rotation(string v, string mode, int index)
         {
-            Translation_rotation translation_rotation = new Translation_rotation("平移旋转修改");
+            Translation_rotation translation_rotation = new Translation_rotation(v);
             translation_rotation.StartPosition = FormStartPosition.CenterScreen;
             translation_rotation.ShowDialog();
             if (translation_rotation.DialogResult == DialogResult.OK)
             {
-                form_class.translation_rotation = translation_rotation;
-                textBox1.AppendText(v + "修改成功！！！X平移" + form_class.translation_rotation.Translation_X.ToString() +
-                    ",Y平移" + form_class.translation_rotation.Translation_Y.ToString() +
-                    ",旋转" + form_class.translation_rotation.Rotation.ToString() + "°\r\n");
+                if (mode == "修改")
+                {
+                    Data_List.data_list[index].mat_dic["translation_M"] = translation_rotation.translation_M;
+                    Data_List.data_list[index].mat_dic["rotation_M"] = translation_rotation.rotation_M;
+                }
+                else if (mode == "插入")
+                {
+                    Data_dic data = new Data_dic();
+                    data.mat_dic = new Dictionary<string, Mat>();
+                    data.mat_dic.Add("translation_M", translation_rotation.translation_M);
+                    data.mat_dic.Add("rotation_M", translation_rotation.rotation_M);
+                    Data_List.data_list.Insert(index, data);
+                }
+                textBox1.AppendText(v + mode + "！！！X平移" + translation_rotation.Translation_X.ToString() +
+                    ",Y平移" + translation_rotation.Translation_Y.ToString() +
+                    ",旋转" + translation_rotation.Rotation.ToString() + "°\r\n");
             }
         }
 
@@ -72,17 +133,31 @@ namespace Image_processing
         /// 黑帽运算参数修改
         /// </summary>
         /// <param name="mode"></param>
-        private void change_black_hat_operation(string mode)
+        private void change_black_hat_operation(string v, string mode, int index)
         {
             Morphological_operation black_hat_operation = new Morphological_operation("黑帽运算");
             black_hat_operation.StartPosition = FormStartPosition.CenterScreen;
             black_hat_operation.ShowDialog();
             if (black_hat_operation.DialogResult == DialogResult.OK)
             {
-                form_class.black_hat_operation = black_hat_operation;
-                textBox1.AppendText(mode + "修改成功！！！核形状为为：" + form_class.black_hat_operation.kernel_shape.ToString() +
-                    ",宽度为：" + form_class.black_hat_operation.kernel_width.ToString() +
-                    ",高度为：" + form_class.black_hat_operation.kernel_height.ToString() + "\r\n");
+                if (mode == "修改")
+                {
+                    Data_List.data_list[index].mat_dic["Kernel"] = black_hat_operation.Kernel;
+                }
+                else if (mode == "插入")
+                {
+                    Data_dic data = new Data_dic
+                    {
+                        mat_dic = new Dictionary<string, Mat>()
+                        {
+                            { "Kernel", black_hat_operation.Kernel }
+                        }
+                    };
+                    Data_List.data_list.Insert(index, data);
+                }
+                textBox1.AppendText(v + mode + "成功！！！核形状为为：" + black_hat_operation.kernel_shape.ToString() +
+                    ",宽度为：" + black_hat_operation.kernel_width.ToString() +
+                    ",高度为：" + black_hat_operation.kernel_height.ToString() + "\r\n");
             }
         }
 
@@ -90,17 +165,31 @@ namespace Image_processing
         /// 顶帽运算参数修改
         /// </summary>
         /// <param name="mode"></param>
-        private void change_top_hat_operation(string mode)
+        private void change_top_hat_operation(string v, string mode, int index)
         {
             Morphological_operation top_hat_operation = new Morphological_operation("顶帽运算");
             top_hat_operation.StartPosition = FormStartPosition.CenterScreen;
             top_hat_operation.ShowDialog();
             if (top_hat_operation.DialogResult == DialogResult.OK)
             {
-                form_class.top_hat_operation = top_hat_operation;
-                textBox1.AppendText(mode + "修改成功！！！核形状为为：" + form_class.top_hat_operation.kernel_shape.ToString() +
-                    ",宽度为：" + form_class.top_hat_operation.kernel_width.ToString() +
-                    ",高度为：" + form_class.top_hat_operation.kernel_height.ToString() + "\r\n");
+                if (mode == "修改")
+                {
+                    Data_List.data_list[index].mat_dic["Kernel"] = top_hat_operation.Kernel;
+                }
+                else if (mode == "插入")
+                {
+                    Data_dic data = new Data_dic
+                    {
+                        mat_dic = new Dictionary<string, Mat>()
+                        {
+                            { "Kernel", top_hat_operation.Kernel }
+                        }
+                    };
+                    Data_List.data_list.Insert(index, data);
+                }
+                textBox1.AppendText(v + mode + "成功！！！核形状为为：" + top_hat_operation.kernel_shape.ToString() +
+                    ",宽度为：" + top_hat_operation.kernel_width.ToString() +
+                    ",高度为：" + top_hat_operation.kernel_height.ToString() + "\r\n");
             }
         }
 
@@ -108,75 +197,128 @@ namespace Image_processing
         /// 梯度运算参数修改
         /// </summary>
         /// <param name="mode"></param>
-        private void change_gradient_operation(string mode)
+        private void change_gradient_operation(string v, string mode, int index)
         {
             Morphological_operation gradient_operation = new Morphological_operation("梯度运算");
             gradient_operation.StartPosition = FormStartPosition.CenterScreen;
             gradient_operation.ShowDialog();
             if (gradient_operation.DialogResult == DialogResult.OK)
             {
-                form_class.gradient_operation = gradient_operation;
-                textBox1.AppendText(mode + "修改成功！！！核形状为为：" + form_class.gradient_operation.kernel_shape.ToString() +
-                    ",宽度为：" + form_class.gradient_operation.kernel_width.ToString() +
-                    ",高度为：" + form_class.gradient_operation.kernel_height.ToString() + "\r\n");
+                if (mode == "修改")
+                {
+                    Data_List.data_list[index].mat_dic["Kernel"] = gradient_operation.Kernel;
+                }
+                else if (mode == "插入")
+                {
+                    Data_dic data = new Data_dic
+                    {
+                        mat_dic = new Dictionary<string, Mat>()
+                        {
+                            { "Kernel", gradient_operation.Kernel }
+                        }
+                    };
+                    Data_List.data_list.Insert(index, data);
+                }
+                textBox1.AppendText(v + mode + "成功！！！核形状为为：" + gradient_operation.kernel_shape.ToString() +
+                                    ",宽度为：" + gradient_operation.kernel_width.ToString() +
+                                    ",高度为：" + gradient_operation.kernel_height.ToString() + "\r\n");
             }
         }
-
 
         /// <summary>
         /// 闭运算参数修改
         /// </summary>
         /// <param name="mode"></param>
-        private void change_close_operation(string mode)
+        private void change_close_operation(string v, string mode, int index)
         {
             Morphological_operation close_operation = new Morphological_operation("闭运算");
             close_operation.StartPosition = FormStartPosition.CenterScreen;
             close_operation.ShowDialog();
             if (close_operation.DialogResult == DialogResult.OK)
             {
-                form_class.close_operation = close_operation;
-                textBox1.AppendText(mode + "修改成功！！！核形状为为：" + form_class.close_operation.kernel_shape.ToString() +
-                    ",宽度为：" + form_class.close_operation.kernel_width.ToString() +
-                    ",高度为：" + form_class.close_operation.kernel_height.ToString() + "\r\n");
+                if (mode == "修改")
+                {
+                    Data_List.data_list[index].mat_dic["Kernel"] = close_operation.Kernel;
+                }
+                else if (mode == "插入")
+                {
+                    Data_dic data = new Data_dic
+                    {
+                        mat_dic = new Dictionary<string, Mat>()
+                        {
+                            { "Kernel", close_operation.Kernel }
+                        }
+                    };
+                    Data_List.data_list.Insert(index, data);
+                }
+                textBox1.AppendText(v + mode + "成功！！！核形状为为：" + close_operation.kernel_shape.ToString() +
+                    ",宽度为：" + close_operation.kernel_width.ToString() +
+                    ",高度为：" + close_operation.kernel_height.ToString() + "\r\n");
             }
         }
-
-
 
         /// <summary>
         /// 开运算参数修改
         /// </summary>
         /// <param name="mode"></param>
-        private void change_open_operation(string mode)
+        private void change_open_operation(string v, string mode, int index)
         {
             Morphological_operation open_operation = new Morphological_operation("开运算");
             open_operation.StartPosition = FormStartPosition.CenterScreen;
             open_operation.ShowDialog();
             if (open_operation.DialogResult == DialogResult.OK)
             {
-                form_class.open_operation = open_operation;
-                textBox1.AppendText(mode + "修改成功！！！核形状为为：" + form_class.open_operation.kernel_shape.ToString() +
-                    ",宽度为：" + form_class.open_operation.kernel_width.ToString() +
-                    ",高度为：" + form_class.open_operation.kernel_height.ToString() + "\r\n");
+
+                if (mode == "修改")
+                {
+                    Data_List.data_list[index].mat_dic["Kernel"] = open_operation.Kernel;
+                }
+                else if (mode == "插入")
+                {
+                    Data_dic data = new Data_dic
+                    {
+                        mat_dic = new Dictionary<string, Mat>()
+                        {
+                            { "Kernel", open_operation.Kernel }
+                        }
+                    };
+                    Data_List.data_list.Insert(index, data);
+                }
+                textBox1.AppendText(v + mode + "成功！！！核形状为为：" + open_operation.kernel_shape.ToString() +
+                    ",宽度为：" + open_operation.kernel_width.ToString() +
+                    ",高度为：" + open_operation.kernel_height.ToString() + "\r\n");
             }
         }
-
 
         /// <summary>
         /// 膨胀参数修改
         /// </summary>
         /// <param name="mode"></param>
-        private void change_expansion(string mode)
+        private void change_expansion(string v, string mode, int index)
         {
             Morphological_operation expansion = new Morphological_operation("膨胀");
             expansion.StartPosition = FormStartPosition.CenterScreen;
             expansion.ShowDialog();
             if (expansion.DialogResult == DialogResult.OK)
             {
-                form_class.expansion = expansion;
-                textBox1.AppendText(mode + "修改成功！！！核形状为为：" + form_class.expansion.kernel_shape.ToString() +
-                    ",宽度为：" + form_class.expansion.kernel_width.ToString() +
-                    ",高度为：" + form_class.expansion.kernel_height.ToString() + "\r\n");
+                if (mode == "修改")
+                {
+                    Data_List.data_list[index].mat_dic["Kernel"] = expansion.Kernel;
+                }
+                else if (mode == "插入")
+                {
+                    Data_dic data = new Data_dic
+                    {
+                        mat_dic = new Dictionary<string, Mat>()
+                        {
+                            { "Kernel", expansion.Kernel }
+                        }
+                    };
+                    Data_List.data_list.Insert(index, data);
+                }
+                textBox1.AppendText(v + mode + "成功！！！核形状为为：" + expansion.kernel_shape.ToString() +
+                    ",宽度为：" + expansion.kernel_width.ToString() +
+                    ",高度为：" + expansion.kernel_height.ToString() + "\r\n");
             }
         }
 
@@ -185,20 +327,33 @@ namespace Image_processing
         /// </summary>
         /// <param name="v"></param>
         /// <exception cref="NotImplementedException"></exception>
-        private void change_corrosion(string mode)
+        private void change_corrosion(string v, string mode, int index)
         {
             Morphological_operation corrosion = new Morphological_operation("腐蚀操作");
             corrosion.StartPosition = FormStartPosition.CenterScreen;
             corrosion.ShowDialog();
             if (corrosion.DialogResult == DialogResult.OK)
             {
-                form_class.corrosion = corrosion;
-                textBox1.AppendText(mode + "修改成功！！！核形状为为：" + form_class.corrosion.kernel_shape.ToString() +
-                    ",宽度为：" + form_class.corrosion.kernel_width.ToString() +
-                    ",高度为：" + form_class.corrosion.kernel_height.ToString() + "\r\n");
+                if (mode == "修改")
+                {
+                    Data_List.data_list[index].mat_dic["Kernel"] = corrosion.Kernel;
+                }
+                else if (mode == "插入")
+                {
+                    Data_dic data = new Data_dic
+                    {
+                        mat_dic = new Dictionary<string, Mat>()
+                        {
+                            { "Kernel", corrosion.Kernel }
+                        }
+                    };
+                    Data_List.data_list.Insert(index, data);
+                }
+                textBox1.AppendText(v + mode + "成功！！！核形状为为：" + corrosion.kernel_shape.ToString() +
+                    ",宽度为：" + corrosion.kernel_width.ToString() +
+                    ",高度为：" + corrosion.kernel_height.ToString() + "\r\n");
             }
         }
-
 
         /// <summary>
         /// Otsu算法参数改变
@@ -206,15 +361,29 @@ namespace Image_processing
         /// <param name=""></param>
         /// <param name="mode"></param>
         /// <exception cref="NotImplementedException"></exception>
-        private void change_Otsu(string mode)
+        private void change_Otsu(string v, string mode, int index)
         {
-            Otsu Otsu = new Otsu(mode);
-            Otsu.StartPosition = FormStartPosition.CenterScreen;
-            Otsu.ShowDialog();
-            if (Otsu.DialogResult == DialogResult.OK)
+            Otsu otsu = new Otsu(mode);
+            otsu.StartPosition = FormStartPosition.CenterScreen;
+            otsu.ShowDialog();
+            if (otsu.DialogResult == DialogResult.OK)
             {
-                form_class.otsu = Otsu;
-                textBox1.AppendText(mode + "修改成功！！！模式为：" + form_class.otsu.Binarization_mode.ToString() + "\r\n");
+                if (mode == "修改")
+                {
+                    Data_List.data_list[index].int_dic["Binarization_mode"] = (int)otsu.Binarization_mode;
+                }
+                else if (mode == "插入")
+                {
+                    Data_dic data = new Data_dic
+                    {
+                        int_dic = new Dictionary<string, int>()
+                        {
+                            { "Binarization_mode", (int)otsu.Binarization_mode },
+                        }
+                    };
+                    Data_List.data_list.Insert(index, data);
+                }
+                textBox1.AppendText(v + mode + "成功！！！模式为：" + otsu.Binarization_mode.ToString() + "\r\n");
             }
         }
 
@@ -222,16 +391,32 @@ namespace Image_processing
         /// 自适应阈值参数改变
         /// </summary>
         /// <param name="mode"></param>
-        private void change_adaptivethreshold(string mode)
+        private void change_adaptivethreshold(string v, string mode, int index)
         {
             Adaptive_Threshold adaptivethreshold = new Adaptive_Threshold();
             adaptivethreshold.StartPosition = FormStartPosition.CenterScreen;
             adaptivethreshold.ShowDialog();
             if (adaptivethreshold.DialogResult == DialogResult.OK)
             {
-                form_class.adaptive_Threshold = adaptivethreshold;
-                textBox1.AppendText(mode + "更改成功！！！自适应阈值算法为：" + form_class.adaptive_Threshold.Adaptive_Types.ToString() +
-                    ",模式为：" + form_class.adaptive_Threshold.Threshold_Types.ToString() + "\r\n");
+                if (mode == "修改")
+                {
+                    Data_List.data_list[index].int_dic["Adaptive_Types"] = (int)adaptivethreshold.Adaptive_Types;
+                    Data_List.data_list[index].int_dic["Threshold_Types"] = (int)adaptivethreshold.Threshold_Types;
+                }
+                else if (mode == "插入")
+                {
+                    Data_dic data = new Data_dic
+                    {
+                        int_dic = new Dictionary<string, int>()
+                        {
+                            { "Adaptive_Types", (int)adaptivethreshold.Adaptive_Types },
+                            { "Threshold_Types",(int)adaptivethreshold.Threshold_Types}
+                        }
+                    };
+                    Data_List.data_list.Insert(index, data);
+                }
+                textBox1.AppendText(v + mode + "成功！！！自适应阈值算法为：" + adaptivethreshold.Adaptive_Types.ToString() +
+                    ",模式为：" + adaptivethreshold.Threshold_Types.ToString() + "\r\n");
             }
         }
 
@@ -240,16 +425,32 @@ namespace Image_processing
         /// </summary>
         /// <param name="mode"></param>
         /// <exception cref="NotImplementedException"></exception>
-        private void change_binarization(string mode)
+        private void change_binarization(string v, string mode, int index)
         {
             Binarization binarization = new Binarization("二值化参数修改");
             binarization.StartPosition = FormStartPosition.CenterScreen;
             binarization.ShowDialog();
             if (binarization.DialogResult == DialogResult.OK)
             {
-                form_class.binarization = binarization;
-                textBox1.AppendText(mode + "修改成功！！！阈值为：" + form_class.binarization.Threshold.ToString() +
-                    ",模式为：" + form_class.binarization.Binarization_mode.ToString() + "\r\n");
+                if (mode == "修改")
+                {
+                    Data_List.data_list[index].int_dic["Threshold"] = binarization.Threshold;
+                    Data_List.data_list[index].int_dic["Binarization_mode"] = (int)binarization.Binarization_mode;
+                }
+                else if (mode == "插入")
+                {
+                    Data_dic data = new Data_dic
+                    {
+                        int_dic = new Dictionary<string, int>()
+                        {
+                            { "Threshold", binarization.Threshold },
+                            { "Binarization_mode",(int)binarization.Binarization_mode}
+                        }
+                    };
+                    Data_List.data_list.Insert(index, data);
+                }
+                textBox1.AppendText(v + mode + "修改成功！！！阈值为：" + binarization.Threshold.ToString() +
+                    ",模式为：" + binarization.Binarization_mode.ToString() + "\r\n");
             }
         }
 
@@ -258,16 +459,32 @@ namespace Image_processing
         /// </summary>
         /// <param name="mode"></param>
         /// <exception cref="NotImplementedException"></exception>
-        private void change_bilateral_filter(string mode)
+        private void change_bilateral_filter(string v, string mode, int index)
         {
             Bilateral_Filter bilateral_Filter = new Bilateral_Filter();
             bilateral_Filter.StartPosition = FormStartPosition.CenterScreen;
             bilateral_Filter.ShowDialog();
             if (bilateral_Filter.DialogResult == DialogResult.OK)
             {
-                form_class.bilateral_filter = bilateral_Filter;
-                textBox1.AppendText(mode + "修改成功！！！sigmaColor为：" + form_class.bilateral_filter.SigmaColor.ToString() +
-                    ",SigmaSpace：" + form_class.bilateral_filter.SigmaSpace.ToString() + "\r\n");
+                if (mode == "修改")
+                {
+                    Data_List.data_list[index].dou_dic["SigmaColor"] = bilateral_Filter.SigmaColor;
+                    Data_List.data_list[index].dou_dic["SigmaSpace"] = bilateral_Filter.SigmaSpace;
+                }
+                else if (mode == "插入")
+                {
+                    Data_dic data = new Data_dic
+                    {
+                        dou_dic = new Dictionary<string, double>()
+                    {
+                        { "SigmaColor", bilateral_Filter.SigmaColor},
+                        { "SigmaSpace",bilateral_Filter.SigmaSpace}
+                    }
+                    };
+                    Data_List.data_list.Insert(index, data);
+                }
+                textBox1.AppendText(v + mode + "修改成功！！！sigmaColor为：" + bilateral_Filter.SigmaColor.ToString() +
+                    ",SigmaSpace：" + bilateral_Filter.SigmaSpace.ToString() + "\r\n");
             }
         }
 
@@ -276,15 +493,24 @@ namespace Image_processing
         /// </summary>
         /// <param name="v"></param>
         /// <exception cref="NotImplementedException"></exception>
-        private void change_median_blur(string mode)
+        private void change_median_blur(string v, string mode, int index)
         {
             Filtering median_Blur = new Filtering(Filtering.模式.奇数, new Filtering.Scope { min = 1, max = 50 }, mode);
             median_Blur.StartPosition = FormStartPosition.CenterScreen;
             median_Blur.ShowDialog();
             if (median_Blur.DialogResult == DialogResult.OK)
             {
-                form_class.median_Blur = median_Blur;
-                textBox1.AppendText(mode + "修改成功！！！核大小为：" + form_class.median_Blur.Value.ToString() + "\r\n");
+                if (mode == "修改")
+                {
+                    Data_List.data_list[index].int_dic["size"] = median_Blur.Value;
+                }
+                else if (mode == "插入")
+                {
+                    Data_dic data = new Data_dic();
+                    data.int_dic = new Dictionary<string, int>() { { "size", median_Blur.Value } };
+                    Data_List.data_list.Insert(index, data);
+                }
+                textBox1.AppendText(v + mode + "成功！！！核大小为：" + median_Blur.Value.ToString() + "\r\n");
             }
         }
 
@@ -292,15 +518,24 @@ namespace Image_processing
         /// 高斯滤波参数更改
         /// </summary>
         /// <exception cref="NotImplementedException"></exception>
-        private void change_gaussian_blur(string mode)
+        private void change_gaussian_blur(string v, string mode, int index)
         {
             Filtering gaussian_Blur = new Filtering(Filtering.模式.奇数, new Filtering.Scope { min = 1, max = 50 }, mode);
             gaussian_Blur.StartPosition = FormStartPosition.CenterScreen;
             gaussian_Blur.ShowDialog();
             if (gaussian_Blur.DialogResult == DialogResult.OK)
             {
-                form_class.gaussian_Blur = gaussian_Blur;
-                textBox1.AppendText("高斯滤波修改成功！！！核大小为：" + form_class.gaussian_Blur.Value.ToString() + "\r\n");
+                if (mode == "修改")
+                {
+                    Data_List.data_list[index].int_dic["size"] = gaussian_Blur.Value;
+                }
+                else if (mode == "插入")
+                {
+                    Data_dic data = new Data_dic();
+                    data.int_dic = new Dictionary<string, int>() { { "size", gaussian_Blur.Value } };
+                    Data_List.data_list.Insert(index, data);
+                }
+                textBox1.AppendText(v + mode + "成功！！！核大小为：" + gaussian_Blur.Value.ToString() + "\r\n");
             }
         }
 
@@ -308,47 +543,74 @@ namespace Image_processing
         ///方框滤波参数更改
         /// </summary>
         /// <exception cref="NotImplementedException"></exception>
-        private void change_box_filtering(string mode)
+        private void change_box_filtering(string v, string mode, int index)
         {
-            Filtering filtering = new Filtering(Filtering.模式.无, new Filtering.Scope { min = 1, max = 50 }, mode);
-            filtering.StartPosition = FormStartPosition.CenterScreen;
-            filtering.ShowDialog();
-            if (filtering.DialogResult == DialogResult.OK)
+            Filtering box_filter = new Filtering(Filtering.模式.无, new Filtering.Scope { min = 1, max = 50 }, mode);
+            box_filter.StartPosition = FormStartPosition.CenterScreen;
+            box_filter.ShowDialog();
+            if (box_filter.DialogResult == DialogResult.OK)
             {
-                form_class.mean_filter = filtering;
-                textBox1.AppendText("均值滤波修改成功！！！核大小为：" + form_class.mean_filter.Value.ToString() + "\r\n");
+                if (mode == "修改")
+                {
+                    Data_List.data_list[index].int_dic["size"] = box_filter.Value;
+                }
+                else if (mode == "插入")
+                {
+                    Data_dic data = new Data_dic();
+                    data.int_dic = new Dictionary<string, int>() { { "size", box_filter.Value } };
+                    Data_List.data_list.Insert(index, data);
+                }
+                textBox1.AppendText(v + mode + "成功！！！核大小为：" + box_filter.Value.ToString() + "\r\n");
             }
         }
 
         /// <summary>
         /// 改变颜色空间参数更改
         /// </summary>
-        private void change_color()
+        private void change_color(string v, string mode, int index)
         {
             colorTo colorto = new colorTo();
             colorto.StartPosition = FormStartPosition.CenterParent;
             colorto.ShowDialog();
             if (colorto.DialogResult == DialogResult.OK)
             {
-                form_class.colorTo = colorto;
-                textBox1.AppendText("颜色空间变化修改成功！！！图片处理为：" + form_class.colorTo.ColorCode.ToString() + "\r\n");
+                if (mode == "修改")
+                {
+                    Data_List.data_list[index].int_dic["ColorCode"] = (int)colorto.ColorCode;
+                }
+                else if (mode == "插入")
+                {
+                    Data_dic data = new Data_dic();
+                    data.int_dic = new Dictionary<string, int>();
+                    data.int_dic.Add("ColorCode", (int)colorto.ColorCode);
+                    Data_List.data_list.Insert(index, data);
+                }
+                textBox1.AppendText(v + mode + "成功！！！图片处理为：" + colorto.ColorCode.ToString() + "\r\n");
             }
         }
 
         /// <summary>
         /// 均值滤波参数更改
         /// </summary>
-        void change_Mean_filtering(string mode)
+        private void change_Mean_filtering(string v, string mode, int index)
         {
-            Filtering filtering = new Filtering(Filtering.模式.无, new Filtering.Scope { min = 1, max = 50 }, mode);
-            filtering.StartPosition = FormStartPosition.CenterScreen;
-            filtering.ShowDialog();
-            if (filtering.DialogResult == DialogResult.OK)
+            Filtering mean_filter = new Filtering(Filtering.模式.无, new Filtering.Scope { min = 1, max = 50 }, mode);
+            mean_filter.StartPosition = FormStartPosition.CenterScreen;
+            mean_filter.ShowDialog();
+            if (mean_filter.DialogResult == DialogResult.OK)
             {
-                form_class.mean_filter = filtering;
-                textBox1.AppendText("均值滤波修改成功！！！核大小为：" + form_class.mean_filter.Value.ToString() + "\r\n");
+                if (mode == "修改")
+                {
+                    Data_List.data_list[index].int_dic["size"] = mean_filter.Value;
+                }
+                else if (mode == "插入")
+                {
+                    Data_dic data = new Data_dic();
+                    data.int_dic = new Dictionary<string, int>() { { "size", mean_filter.Value } };
+                    Data_List.data_list.Insert(index, data);
+                }
+                textBox1.AppendText(v + mode + "成功！！！图片处理为：" + mean_filter.Value.ToString() + "\r\n");
             }
-
         }
     }
 }

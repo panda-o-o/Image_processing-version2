@@ -14,6 +14,7 @@ namespace Image_processing.form
         }
 
         public ColorConversionCodes ColorCode { get; set; }
+
         private Dictionary<string, ColorConversionCodes> color;
         private Dictionary<string, string> remind;
 

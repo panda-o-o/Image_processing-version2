@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Image_processing.Class
 {
-    public delegate void del_process(ref Mat img,ref Mat mask);
+    public delegate void del_process(ref Mat img,ref Mat mask,ref int count);
     public class linked_list
     {
         // 定义一个委托链表
@@ -25,7 +25,7 @@ namespace Image_processing.Class
         }
 
         // 调用委托链表中的所有委托
-        public void InvokeDelegates(ref Mat img, ref Mat mask)
+        public void InvokeDelegates(ref Mat img, ref Mat mask,ref int count)
         {
             // 遍历委托链表中的每一个委托
             foreach (del_process del in List?.GetInvocationList() ?? Enumerable.Empty<Delegate>())
@@ -33,7 +33,7 @@ namespace Image_processing.Class
                 try
                 {
                     // 执行委托
-                    del(ref img, ref mask);
+                    del(ref img, ref mask,ref count);
                 }
                 catch (Exception ex)
                 {
@@ -82,7 +82,7 @@ namespace Image_processing.Class
 
             if (delegateArray == null)
             {
-                // 如果链表为空，则直接将新委托添加到链表的末尾
+                // 如果链表为空,则直接将新委托添加到链表的末尾
                 AddDelegate(newDelegate);
                 return;
             }
@@ -92,7 +92,7 @@ namespace Image_processing.Class
                 throw new ArgumentException("Position is out of range", "position");
             }
 
-            // 创建一个新数组，它的长度比旧数组多1
+            // 创建一个新数组,它的长度比旧数组多1
             var newDelegateArray = new del_process[delegateArray.Length + 1];
 
             // 将新委托插入到新数组中的指定位置

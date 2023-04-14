@@ -82,11 +82,11 @@ namespace Image_processing
             OpenFileDialog openFileDialog = new OpenFileDialog();
             SaveFileDialog saveImageDialog = new SaveFileDialog();
             saveImageDialog.Title = "图片保存";
-            saveImageDialog.Filter = "jpg图片|*.jpg|gif图片|*.gif|png图片|*.png|jpeg图片|*.jpeg|BMP图片|*.bmp";//文件类型过滤，只可选择图片的类型
+            saveImageDialog.Filter = "jpg图片|*.jpg|gif图片|*.gif|png图片|*.png|jpeg图片|*.jpeg|BMP图片|*.bmp";//文件类型过滤,只可选择图片的类型
             saveImageDialog.FilterIndex = 1;//设置默认文件类型显示顺序
-            saveImageDialog.FileName = "图片保存"; //设置默认文件名，可为空
-            saveImageDialog.RestoreDirectory = true; //OpenFileDialog与SaveFileDialog都有RestoreDirectory属性，这个属性默认是false，
-                                                     //打开一个文件后，那么系统默认目录就会指向刚才打开的文件。如果设为true就会使用系统默认目录
+            saveImageDialog.FileName = "图片保存"; //设置默认文件名,可为空
+            saveImageDialog.RestoreDirectory = true; //OpenFileDialog与SaveFileDialog都有RestoreDirectory属性,这个属性默认是false,
+                                                     //打开一个文件后,那么系统默认目录就会指向刚才打开的文件。如果设为true就会使用系统默认目录
             saveImageDialog.InitialDirectory = @"F:\user\Pictures\Saved Pictures";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
@@ -107,11 +107,11 @@ namespace Image_processing
         {
             SaveFileDialog saveImageDialog = new SaveFileDialog();
             saveImageDialog.Title = "图片保存";
-            saveImageDialog.Filter = "jpg图片|*.jpg|gif图片|*.gif|png图片|*.png|jpeg图片|*.jpeg|BMP图片|*.bmp";//文件类型过滤，只可选择图片的类型
+            saveImageDialog.Filter = "jpg图片|*.jpg|gif图片|*.gif|png图片|*.png|jpeg图片|*.jpeg|BMP图片|*.bmp";//文件类型过滤,只可选择图片的类型
             saveImageDialog.FilterIndex = 1;//设置默认文件类型显示顺序
-            saveImageDialog.FileName = "图片保存"; //设置默认文件名，可为空
-            saveImageDialog.RestoreDirectory = true; //OpenFileDialog与SaveFileDialog都有RestoreDirectory属性，这个属性默认是false，
-                                                     //打开一个文件后，那么系统默认目录就会指向刚才打开的文件。如果设为true就会使用系统默认目录
+            saveImageDialog.FileName = "图片保存"; //设置默认文件名,可为空
+            saveImageDialog.RestoreDirectory = true; //OpenFileDialog与SaveFileDialog都有RestoreDirectory属性,这个属性默认是false,
+                                                     //打开一个文件后,那么系统默认目录就会指向刚才打开的文件。如果设为true就会使用系统默认目录
             saveImageDialog.InitialDirectory = @"F:\Pictures\Saved Pictures";
             if (saveImageDialog.ShowDialog() == DialogResult.OK)
             {
@@ -164,7 +164,7 @@ namespace Image_processing
         {
             if (img.Empty())
             {
-                textBox1.AppendText("没有图片呀，处理什么呀！！！\r\n");
+                textBox1.AppendText("没有图片呀,处理什么呀！！！\r\n");
                 return;
             }
             Task.Run(() =>
@@ -175,7 +175,8 @@ namespace Image_processing
                 }));
                 Stopwatch sw = Stopwatch.StartNew();
                 mat = img.Clone();
-                link.InvokeDelegates(ref mat, ref mask);
+                int count = 0;
+                link.InvokeDelegates(ref mat, ref mask, ref count);
                 pictureBox1.Image = OpenCV.GetMat(mat);
                 double time = sw.ElapsedMilliseconds;
                 if (time / 1000 > 10)
@@ -202,16 +203,16 @@ namespace Image_processing
         private void 查看图片信息ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Image img = pictureBox1.Image;
-            if (img != null)//需要判断图片是否为空，已经是否被实例化
+            if (img != null)//需要判断图片是否为空,已经是否被实例化
             {
                 Mat mat = OpenCvSharp.Extensions.BitmapConverter.ToMat((Bitmap)img);
-                MessageBox.Show("图片宽度：" + mat.Cols + "，图片高度：" + mat.Rows +
-                    "，图片通道数：" + mat.Channels(), "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("图片宽度：" + mat.Cols + ",图片高度：" + mat.Rows +
+                    ",图片通道数：" + mat.Channels(), "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
 
-        private Point start;//按下鼠标的起点，对应的mat对象
+        private Point start;//按下鼠标的起点,对应的mat对象
         private System.Drawing.Point startPoint;
         private System.Drawing.Point endPoint;
 
@@ -269,7 +270,7 @@ namespace Image_processing
                     byte blue = bgr[0];   // 蓝色通道值
                     byte green = bgr[1];  // 绿色通道值
                     byte red = bgr[2];    // 红色通道值
-                    toolStripStatusLabel1.Text = "红色通道值：" + red + "，绿色通道值：" + green + "，蓝色通道值：" + blue;
+                    toolStripStatusLabel1.Text = "红色通道值：" + red + ",绿色通道值：" + green + ",蓝色通道值：" + blue;
                     // 记录鼠标按下的起始点
                     startPoint = e.Location;
                 }
@@ -332,11 +333,12 @@ namespace Image_processing
             {
                 string? list = listBox1.SelectedItem.ToString();
                 link.RemoveDelegateAt(listBox1.SelectedIndex);
+                Data_List.data_list.RemoveAt(listBox1.SelectedIndex);
                 listBox1.Items.Remove(listBox1.SelectedItem);
                 textBox1.AppendText(list + "删除成功\r\n");
             }
         }
-        private void 上方插入ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void 插入ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (listBox1.SelectedItem != null)
             {
@@ -346,26 +348,12 @@ namespace Image_processing
                 if (insert.DialogResult == DialogResult.OK)
                 {
                     link.InsertDelegateAtPosition(insert._Process, listBox1.SelectedIndex);
+                    change_set_parameter(insert._Name, "插入", listBox1.SelectedIndex);
                     listBox1.Items.Insert(listBox1.SelectedIndex, insert._Name);
-                    change_set_parameter(insert._Name);
                 }
             }
         }
-        private void 下方插入ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (listBox1.SelectedItem != null)
-            {
-                Insert insert = new Insert();
-                insert.StartPosition = FormStartPosition.CenterScreen;
-                insert.ShowDialog();
-                if (insert.DialogResult == DialogResult.OK)
-                {
-                    link.InsertDelegateAtPosition(insert._Process, listBox1.SelectedIndex);
-                    listBox1.Items.Insert(listBox1.SelectedIndex + 1, insert._Name);
-                    change_set_parameter(insert._Name);
-                }
-            }
-        }
+
 
         /// <summary>
         /// 更改流程参数

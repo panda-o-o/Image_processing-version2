@@ -33,8 +33,8 @@ namespace Image_processing.form.二值化
             
             dic.TryAdd("Binary", ThresholdTypes.Binary);
             dic.TryAdd("BinaryInv", ThresholdTypes.BinaryInv);
-            uiRichTextBox1.Text = "Binary: 将像素值大于阈值的部分设置为最大值，其余部分设置为0\r\n" +
-                "BinaryInv: 将像素值小于阈值的部分设置为最大值，其余部分设置为0\r\n";
+            uiRichTextBox1.Text = "Binary: 将像素值大于阈值的部分设置为最大值,其余部分设置为0\r\n" +
+                "BinaryInv: 将像素值小于阈值的部分设置为最大值,其余部分设置为0\r\n";
             foreach (var key in dic.Keys)
             {
                 uiComboBox1.Items.Add(key);

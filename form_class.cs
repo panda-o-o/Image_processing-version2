@@ -16,6 +16,7 @@ namespace Image_processing
     public class form_class
     {
         public static colorTo? colorTo;
+
         public static Filtering? mean_filter, box_filter, gaussian_Blur, median_Blur;
         public static Bilateral_Filter? bilateral_filter;
         public static FlipMode x_flipMode, y_flipMode, xy_flipMode;
