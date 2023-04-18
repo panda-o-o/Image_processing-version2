@@ -3,6 +3,7 @@ using Image_processing.form;
 using Image_processing.form.二值化;
 using Image_processing.form.平移旋转;
 using Image_processing.form.形态学操作;
+using Image_processing.form.模板匹配;
 using Image_processing.form.滤波;
 using OpenCvSharp;
 
@@ -41,9 +42,47 @@ namespace Image_processing
                 case ("顶帽运算"): change_top_hat_operation("顶帽运算", mode, index); break;
                 case ("黑帽运算"): change_black_hat_operation("黑帽运算", mode, index); break;
                 case ("平移旋转"): change_translation_rotation("平移旋转", mode, index); break;
+                case ("模板匹配"): change_template_matching("模板匹配", mode, index); break;
                 default:
                     // Handle the case where the element is not of any expected type
                     break;
+            }
+        }
+
+        private void change_template_matching(string v, string mode, int index)
+        {
+            Template_Matching template_Matching = new Template_Matching("模板匹配");
+            template_Matching.StartPosition = FormStartPosition.CenterScreen;
+            template_Matching.ShowDialog();
+            if (template_Matching.DialogResult == DialogResult.OK)
+            {
+                if (mode == "修改")
+                {
+                    data_List.Data_list[index].mat_dic["Template"] = template_Matching.Template;
+                    data_List.Data_list[index].dou_dic["Threshold"] = template_Matching.Threshold;
+                    data_List.Data_list[index].int_dic["Template_Match_Modes"] = template_Matching.Template_Match_Modes;
+                }
+                else if (mode == "插入")
+                {
+                    Data_dic data = new Data_dic
+                    {
+                        mat_dic = new Dictionary<string, Mat>()
+                    {
+                         { "Template", template_Matching.Template}
+                    },
+                        dou_dic = new Dictionary<string, double>()
+                    {
+                        {"Threshold", template_Matching.Threshold}
+                    },
+                        int_dic = new Dictionary<string, int>()
+                    {
+                        { "Template_Match_Modes",template_Matching.Template_Match_Modes }
+                    }
+                    };
+                    data_List.Data_list.Add(data);
+                }
+                textBox1.AppendText(v + mode + "成功！！！模式为：" + template_Matching.uiComboBox1.SelectedText +
+                    "模板为：" + template_Matching.Pic_name + "，置信度为：" + template_Matching.Threshold.ToString() + "\r\n");
             }
         }
 
@@ -59,7 +98,7 @@ namespace Image_processing
                 {
                     int_dic = new Dictionary<string, int>() { { "Flip", (int)FlipMode.XY } }
                 };
-                Data_List.data_list.Insert(index, data);
+                data_List.Data_list.Insert(index, data);
                 textBox1.AppendText(v + mode + "\r\n");
             }
 
@@ -77,7 +116,7 @@ namespace Image_processing
                 {
                     int_dic = new Dictionary<string, int>() { { "Flip", (int)FlipMode.Y } }
                 };
-                Data_List.data_list.Insert(index, data);
+                data_List.Data_list.Insert(index, data);
                 textBox1.AppendText(v + mode + "\r\n");
             }
         }
@@ -94,7 +133,7 @@ namespace Image_processing
                 {
                     int_dic = new Dictionary<string, int>() { { "Flip", (int)FlipMode.X } }
                 };
-                Data_List.data_list.Insert(index, data);
+                data_List.Data_list.Insert(index, data);
                 textBox1.AppendText(v + mode + "\r\n");
             }
         }
@@ -112,8 +151,8 @@ namespace Image_processing
             {
                 if (mode == "修改")
                 {
-                    Data_List.data_list[index].mat_dic["translation_M"] = translation_rotation.translation_M;
-                    Data_List.data_list[index].mat_dic["rotation_M"] = translation_rotation.rotation_M;
+                    data_List.Data_list[index].mat_dic["translation_M"] = translation_rotation.translation_M;
+                    data_List.Data_list[index].mat_dic["rotation_M"] = translation_rotation.rotation_M;
                 }
                 else if (mode == "插入")
                 {
@@ -121,7 +160,7 @@ namespace Image_processing
                     data.mat_dic = new Dictionary<string, Mat>();
                     data.mat_dic.Add("translation_M", translation_rotation.translation_M);
                     data.mat_dic.Add("rotation_M", translation_rotation.rotation_M);
-                    Data_List.data_list.Insert(index, data);
+                    data_List.Data_list.Insert(index, data);
                 }
                 textBox1.AppendText(v + mode + "！！！X平移" + translation_rotation.Translation_X.ToString() +
                     ",Y平移" + translation_rotation.Translation_Y.ToString() +
@@ -142,7 +181,7 @@ namespace Image_processing
             {
                 if (mode == "修改")
                 {
-                    Data_List.data_list[index].mat_dic["Kernel"] = black_hat_operation.Kernel;
+                    data_List.Data_list[index].mat_dic["Kernel"] = black_hat_operation.Kernel;
                 }
                 else if (mode == "插入")
                 {
@@ -153,7 +192,7 @@ namespace Image_processing
                             { "Kernel", black_hat_operation.Kernel }
                         }
                     };
-                    Data_List.data_list.Insert(index, data);
+                    data_List.Data_list.Insert(index, data);
                 }
                 textBox1.AppendText(v + mode + "成功！！！核形状为为：" + black_hat_operation.kernel_shape.ToString() +
                     ",宽度为：" + black_hat_operation.kernel_width.ToString() +
@@ -174,7 +213,7 @@ namespace Image_processing
             {
                 if (mode == "修改")
                 {
-                    Data_List.data_list[index].mat_dic["Kernel"] = top_hat_operation.Kernel;
+                    data_List.Data_list[index].mat_dic["Kernel"] = top_hat_operation.Kernel;
                 }
                 else if (mode == "插入")
                 {
@@ -185,7 +224,7 @@ namespace Image_processing
                             { "Kernel", top_hat_operation.Kernel }
                         }
                     };
-                    Data_List.data_list.Insert(index, data);
+                    data_List.Data_list.Insert(index, data);
                 }
                 textBox1.AppendText(v + mode + "成功！！！核形状为为：" + top_hat_operation.kernel_shape.ToString() +
                     ",宽度为：" + top_hat_operation.kernel_width.ToString() +
@@ -206,7 +245,7 @@ namespace Image_processing
             {
                 if (mode == "修改")
                 {
-                    Data_List.data_list[index].mat_dic["Kernel"] = gradient_operation.Kernel;
+                    data_List.Data_list[index].mat_dic["Kernel"] = gradient_operation.Kernel;
                 }
                 else if (mode == "插入")
                 {
@@ -217,7 +256,7 @@ namespace Image_processing
                             { "Kernel", gradient_operation.Kernel }
                         }
                     };
-                    Data_List.data_list.Insert(index, data);
+                    data_List.Data_list.Insert(index, data);
                 }
                 textBox1.AppendText(v + mode + "成功！！！核形状为为：" + gradient_operation.kernel_shape.ToString() +
                                     ",宽度为：" + gradient_operation.kernel_width.ToString() +
@@ -238,7 +277,7 @@ namespace Image_processing
             {
                 if (mode == "修改")
                 {
-                    Data_List.data_list[index].mat_dic["Kernel"] = close_operation.Kernel;
+                    data_List.Data_list[index].mat_dic["Kernel"] = close_operation.Kernel;
                 }
                 else if (mode == "插入")
                 {
@@ -249,7 +288,7 @@ namespace Image_processing
                             { "Kernel", close_operation.Kernel }
                         }
                     };
-                    Data_List.data_list.Insert(index, data);
+                    data_List.Data_list.Insert(index, data);
                 }
                 textBox1.AppendText(v + mode + "成功！！！核形状为为：" + close_operation.kernel_shape.ToString() +
                     ",宽度为：" + close_operation.kernel_width.ToString() +
@@ -271,7 +310,7 @@ namespace Image_processing
 
                 if (mode == "修改")
                 {
-                    Data_List.data_list[index].mat_dic["Kernel"] = open_operation.Kernel;
+                    data_List.Data_list[index].mat_dic["Kernel"] = open_operation.Kernel;
                 }
                 else if (mode == "插入")
                 {
@@ -282,7 +321,7 @@ namespace Image_processing
                             { "Kernel", open_operation.Kernel }
                         }
                     };
-                    Data_List.data_list.Insert(index, data);
+                    data_List.Data_list.Insert(index, data);
                 }
                 textBox1.AppendText(v + mode + "成功！！！核形状为为：" + open_operation.kernel_shape.ToString() +
                     ",宽度为：" + open_operation.kernel_width.ToString() +
@@ -303,7 +342,7 @@ namespace Image_processing
             {
                 if (mode == "修改")
                 {
-                    Data_List.data_list[index].mat_dic["Kernel"] = expansion.Kernel;
+                    data_List.Data_list[index].mat_dic["Kernel"] = expansion.Kernel;
                 }
                 else if (mode == "插入")
                 {
@@ -314,7 +353,7 @@ namespace Image_processing
                             { "Kernel", expansion.Kernel }
                         }
                     };
-                    Data_List.data_list.Insert(index, data);
+                    data_List.Data_list.Insert(index, data);
                 }
                 textBox1.AppendText(v + mode + "成功！！！核形状为为：" + expansion.kernel_shape.ToString() +
                     ",宽度为：" + expansion.kernel_width.ToString() +
@@ -336,7 +375,7 @@ namespace Image_processing
             {
                 if (mode == "修改")
                 {
-                    Data_List.data_list[index].mat_dic["Kernel"] = corrosion.Kernel;
+                    data_List.Data_list[index].mat_dic["Kernel"] = corrosion.Kernel;
                 }
                 else if (mode == "插入")
                 {
@@ -347,7 +386,7 @@ namespace Image_processing
                             { "Kernel", corrosion.Kernel }
                         }
                     };
-                    Data_List.data_list.Insert(index, data);
+                    data_List.Data_list.Insert(index, data);
                 }
                 textBox1.AppendText(v + mode + "成功！！！核形状为为：" + corrosion.kernel_shape.ToString() +
                     ",宽度为：" + corrosion.kernel_width.ToString() +
@@ -370,7 +409,7 @@ namespace Image_processing
             {
                 if (mode == "修改")
                 {
-                    Data_List.data_list[index].int_dic["Binarization_mode"] = (int)otsu.Binarization_mode;
+                    data_List.Data_list[index].int_dic["Binarization_mode"] = (int)otsu.Binarization_mode;
                 }
                 else if (mode == "插入")
                 {
@@ -381,7 +420,7 @@ namespace Image_processing
                             { "Binarization_mode", (int)otsu.Binarization_mode },
                         }
                     };
-                    Data_List.data_list.Insert(index, data);
+                    data_List.Data_list.Insert(index, data);
                 }
                 textBox1.AppendText(v + mode + "成功！！！模式为：" + otsu.Binarization_mode.ToString() + "\r\n");
             }
@@ -400,8 +439,8 @@ namespace Image_processing
             {
                 if (mode == "修改")
                 {
-                    Data_List.data_list[index].int_dic["Adaptive_Types"] = (int)adaptivethreshold.Adaptive_Types;
-                    Data_List.data_list[index].int_dic["Threshold_Types"] = (int)adaptivethreshold.Threshold_Types;
+                    data_List.Data_list[index].int_dic["Adaptive_Types"] = (int)adaptivethreshold.Adaptive_Types;
+                    data_List.Data_list[index].int_dic["Threshold_Types"] = (int)adaptivethreshold.Threshold_Types;
                 }
                 else if (mode == "插入")
                 {
@@ -413,7 +452,7 @@ namespace Image_processing
                             { "Threshold_Types",(int)adaptivethreshold.Threshold_Types}
                         }
                     };
-                    Data_List.data_list.Insert(index, data);
+                    data_List.Data_list.Insert(index, data);
                 }
                 textBox1.AppendText(v + mode + "成功！！！自适应阈值算法为：" + adaptivethreshold.Adaptive_Types.ToString() +
                     ",模式为：" + adaptivethreshold.Threshold_Types.ToString() + "\r\n");
@@ -434,8 +473,8 @@ namespace Image_processing
             {
                 if (mode == "修改")
                 {
-                    Data_List.data_list[index].int_dic["Threshold"] = binarization.Threshold;
-                    Data_List.data_list[index].int_dic["Binarization_mode"] = (int)binarization.Binarization_mode;
+                    data_List.Data_list[index].int_dic["Threshold"] = binarization.Threshold;
+                    data_List.Data_list[index].int_dic["Binarization_mode"] = (int)binarization.Binarization_mode;
                 }
                 else if (mode == "插入")
                 {
@@ -447,7 +486,7 @@ namespace Image_processing
                             { "Binarization_mode",(int)binarization.Binarization_mode}
                         }
                     };
-                    Data_List.data_list.Insert(index, data);
+                    data_List.Data_list.Insert(index, data);
                 }
                 textBox1.AppendText(v + mode + "修改成功！！！阈值为：" + binarization.Threshold.ToString() +
                     ",模式为：" + binarization.Binarization_mode.ToString() + "\r\n");
@@ -468,8 +507,8 @@ namespace Image_processing
             {
                 if (mode == "修改")
                 {
-                    Data_List.data_list[index].dou_dic["SigmaColor"] = bilateral_Filter.SigmaColor;
-                    Data_List.data_list[index].dou_dic["SigmaSpace"] = bilateral_Filter.SigmaSpace;
+                    data_List.Data_list[index].dou_dic["SigmaColor"] = bilateral_Filter.SigmaColor;
+                    data_List.Data_list[index].dou_dic["SigmaSpace"] = bilateral_Filter.SigmaSpace;
                 }
                 else if (mode == "插入")
                 {
@@ -481,7 +520,7 @@ namespace Image_processing
                         { "SigmaSpace",bilateral_Filter.SigmaSpace}
                     }
                     };
-                    Data_List.data_list.Insert(index, data);
+                    data_List.Data_list.Insert(index, data);
                 }
                 textBox1.AppendText(v + mode + "修改成功！！！sigmaColor为：" + bilateral_Filter.SigmaColor.ToString() +
                     ",SigmaSpace：" + bilateral_Filter.SigmaSpace.ToString() + "\r\n");
@@ -502,13 +541,13 @@ namespace Image_processing
             {
                 if (mode == "修改")
                 {
-                    Data_List.data_list[index].int_dic["size"] = median_Blur.Value;
+                    data_List.Data_list[index].int_dic["size"] = median_Blur.Value;
                 }
                 else if (mode == "插入")
                 {
                     Data_dic data = new Data_dic();
                     data.int_dic = new Dictionary<string, int>() { { "size", median_Blur.Value } };
-                    Data_List.data_list.Insert(index, data);
+                    data_List.Data_list.Insert(index, data);
                 }
                 textBox1.AppendText(v + mode + "成功！！！核大小为：" + median_Blur.Value.ToString() + "\r\n");
             }
@@ -527,13 +566,13 @@ namespace Image_processing
             {
                 if (mode == "修改")
                 {
-                    Data_List.data_list[index].int_dic["size"] = gaussian_Blur.Value;
+                    data_List.Data_list[index].int_dic["size"] = gaussian_Blur.Value;
                 }
                 else if (mode == "插入")
                 {
                     Data_dic data = new Data_dic();
                     data.int_dic = new Dictionary<string, int>() { { "size", gaussian_Blur.Value } };
-                    Data_List.data_list.Insert(index, data);
+                    data_List.Data_list.Insert(index, data);
                 }
                 textBox1.AppendText(v + mode + "成功！！！核大小为：" + gaussian_Blur.Value.ToString() + "\r\n");
             }
@@ -552,13 +591,13 @@ namespace Image_processing
             {
                 if (mode == "修改")
                 {
-                    Data_List.data_list[index].int_dic["size"] = box_filter.Value;
+                    data_List.Data_list[index].int_dic["size"] = box_filter.Value;
                 }
                 else if (mode == "插入")
                 {
                     Data_dic data = new Data_dic();
                     data.int_dic = new Dictionary<string, int>() { { "size", box_filter.Value } };
-                    Data_List.data_list.Insert(index, data);
+                    data_List.Data_list.Insert(index, data);
                 }
                 textBox1.AppendText(v + mode + "成功！！！核大小为：" + box_filter.Value.ToString() + "\r\n");
             }
@@ -576,14 +615,14 @@ namespace Image_processing
             {
                 if (mode == "修改")
                 {
-                    Data_List.data_list[index].int_dic["ColorCode"] = (int)colorto.ColorCode;
+                    data_List.Data_list[index].int_dic["ColorCode"] = (int)colorto.ColorCode;
                 }
                 else if (mode == "插入")
                 {
                     Data_dic data = new Data_dic();
                     data.int_dic = new Dictionary<string, int>();
                     data.int_dic.Add("ColorCode", (int)colorto.ColorCode);
-                    Data_List.data_list.Insert(index, data);
+                    data_List.Data_list.Insert(index, data);
                 }
                 textBox1.AppendText(v + mode + "成功！！！图片处理为：" + colorto.ColorCode.ToString() + "\r\n");
             }
@@ -601,13 +640,13 @@ namespace Image_processing
             {
                 if (mode == "修改")
                 {
-                    Data_List.data_list[index].int_dic["size"] = mean_filter.Value;
+                    data_List.Data_list[index].int_dic["size"] = mean_filter.Value;
                 }
                 else if (mode == "插入")
                 {
                     Data_dic data = new Data_dic();
                     data.int_dic = new Dictionary<string, int>() { { "size", mean_filter.Value } };
-                    Data_List.data_list.Insert(index, data);
+                    data_List.Data_list.Insert(index, data);
                 }
                 textBox1.AppendText(v + mode + "成功！！！图片处理为：" + mean_filter.Value.ToString() + "\r\n");
             }

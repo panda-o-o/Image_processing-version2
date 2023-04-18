@@ -1,17 +1,14 @@
 using AutoWindowsSize;
 using Image_processing.Class;
-using Image_processing.form;
 using Image_processing.main_Form;
 using OpenCvSharp;
 using Sunny.UI;
-using System;
 using System.Diagnostics;
-using System.Windows.Forms;
-using System.Xml.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.Json.Serialization;
 using Point = OpenCvSharp.Point;
-//using Point = OpenCvSharp.Point;
+using System.Text.Json;
+
 
 namespace Image_processing
 {
@@ -21,7 +18,8 @@ namespace Image_processing
         public linked_list link;
         public Mat img;
         public Mat mask;
-        public static Mat mat;//图片处理备份
+        public static Mat? mat;//图片处理备份
+        public static Data_List data_List;
 
         #region 窗体加载
         public Main_form()
@@ -32,7 +30,7 @@ namespace Image_processing
             img = new Mat();
             mask = new Mat();
             mat = new Mat();
-
+            data_List = new Data_List();
         }
 
         protected override CreateParams CreateParams
@@ -78,14 +76,18 @@ namespace Image_processing
             }
 
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            SaveFileDialog saveImageDialog = new SaveFileDialog();
-            saveImageDialog.Title = "图片保存";
-            saveImageDialog.Filter = "jpg图片|*.jpg|gif图片|*.gif|png图片|*.png|jpeg图片|*.jpeg|BMP图片|*.bmp";//文件类型过滤,只可选择图片的类型
-            saveImageDialog.FilterIndex = 1;//设置默认文件类型显示顺序
-            saveImageDialog.FileName = "图片保存"; //设置默认文件名,可为空
-            saveImageDialog.RestoreDirectory = true; //OpenFileDialog与SaveFileDialog都有RestoreDirectory属性,这个属性默认是false,
-                                                     //打开一个文件后,那么系统默认目录就会指向刚才打开的文件。如果设为true就会使用系统默认目录
-            saveImageDialog.InitialDirectory = @"F:\user\Pictures\Saved Pictures";
+            //打开的文件选择对话框上的标题
+            openFileDialog.Title = "请选择文件";
+            //设置文件类型
+            openFileDialog.Filter = "jpg图片|*.JPG|gif图片|*.GIF|png图片|*.PNG|jpeg图片|*.JPEG|BMP图片|*.BMP";
+            //设置默认文件类型显示顺序
+            openFileDialog.FilterIndex = 1;
+            //保存对话框是否记忆上次打开的目录
+            openFileDialog.RestoreDirectory = true;
+            //设置是否允许多选
+            openFileDialog.Multiselect = false;
+            //默认打开路径
+            openFileDialog.InitialDirectory = @"F:\user\Pictures\Saved Pictures";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string path = openFileDialog.FileName;
@@ -331,7 +333,7 @@ namespace Image_processing
             {
                 string? list = listBox1.SelectedItem.ToString();
                 link.RemoveDelegateAt(listBox1.SelectedIndex);
-                Data_List.data_list.RemoveAt(listBox1.SelectedIndex);
+                data_List.Data_list.RemoveAt(listBox1.SelectedIndex);
                 listBox1.Items.Remove(listBox1.SelectedItem);
                 textBox1.AppendText(list + "删除成功\r\n");
             }
@@ -421,6 +423,16 @@ namespace Image_processing
 
 
 
+        private void open_Configuration_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void save_Configuration_Click(object sender, EventArgs e)
+        {
+            
+        }
     }
+
 
 }

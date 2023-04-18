@@ -216,6 +216,7 @@
             save_Configuration.Style = Sunny.UI.UIStyle.Custom;
             save_Configuration.TabIndex = 0;
             save_Configuration.Text = "保存配置文件";
+            save_Configuration.Click += save_Configuration_Click;
             // 
             // open_Configuration
             // 
@@ -227,6 +228,7 @@
             open_Configuration.Style = Sunny.UI.UIStyle.Custom;
             open_Configuration.TabIndex = 0;
             open_Configuration.Text = "打开配置文件";
+            open_Configuration.Click += open_Configuration_Click;
             // 
             // save_pic
             // 

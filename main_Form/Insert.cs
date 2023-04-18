@@ -48,7 +48,8 @@ namespace Image_processing.main_Form
                 ("梯度运算", new del_process(OpenCV.Gradient_operation)),
                 ("顶帽运算", new del_process(OpenCV.Top_hat_operation)),
                 ("黑帽运算", new del_process(OpenCV.Black_hat_operation)),
-                ("平移旋转",new del_process(OpenCV.Translation_rotation))
+                ("平移旋转",new del_process(OpenCV.Translation_rotation)),
+                ("模板匹配",new del_process(OpenCV.Template_Match))
             };
             foreach (var tupe in tupes)
             {

@@ -3,8 +3,10 @@ using Image_processing.form;
 using Image_processing.form.二值化;
 using Image_processing.form.平移旋转;
 using Image_processing.form.形态学操作;
+using Image_processing.form.模板匹配;
 using Image_processing.form.滤波;
 using OpenCvSharp;
+using Sunny.UI;
 
 namespace Image_processing
 {
@@ -54,6 +56,10 @@ namespace Image_processing
                 new TreeNode("平移旋转",new []
                 {
                     new TreeNode("平移旋转"){ ToolTipText = "将图像进行旋转平移" }
+                }), 
+                new TreeNode("模板匹配",new []
+                { 
+                    new TreeNode("模板匹配"){ ToolTipText = "选择一个模板，找出匹配位置" }
                 })
             };
 
@@ -130,10 +136,51 @@ namespace Image_processing
                             case ("平移旋转"): Translation_rotation("平移旋转"); break;
                         }
                         break;
+                    case "模板匹配":
+                        switch (e.Node.Text)
+                        {
+                            case ("模板匹配"): Template_matching("模板匹配"); break;
+                        }
+                        break;
                 }
             }
         }
 
+        private void Template_matching(string v)
+        {
+            Template_Matching template_Matching = new Template_Matching("模板匹配");
+            template_Matching.StartPosition = FormStartPosition.CenterScreen;
+            template_Matching.ShowDialog();
+            if (template_Matching.DialogResult==DialogResult.OK)
+            {
+                Data_dic data = new Data_dic
+                {
+                    mat_dic = new Dictionary<string, Mat>()
+                    {
+                         { "Template", template_Matching.Template}
+                    },
+                    dou_dic=new Dictionary<string, double>() 
+                    {
+                        {"Threshold", template_Matching.Threshold}
+                    },
+                    int_dic=new Dictionary<string, int>()
+                    {
+                        { "Template_Match_Modes",template_Matching.Template_Match_Modes }
+                    }
+                };
+                data_List.Data_list.Add(data);
+
+                listBox1.Items.Add(v);
+                del_process Template_Match = OpenCV.Template_Match;
+                link.AddDelegate(Template_Match);
+
+                textBox1.AppendText(v + "添加成功！！！模式为：" + template_Matching.uiComboBox1.SelectedText +
+                    "模板为："+ template_Matching.Pic_name+"，置信度为：" + template_Matching.Threshold.ToString() +"\r\n");
+            }
+        }
+
+
+        #region 平移旋转
         /// <summary>
         /// 平移旋转
         /// </summary>
@@ -153,7 +200,7 @@ namespace Image_processing
                          { "rotation_M", translation_rotation.rotation_M }
                     }
                 };
-                Data_List.data_list.Add(data);
+                data_List.Data_list.Add(data);
 
                 listBox1.Items.Add(v);
                 del_process Translation_rotation = OpenCV.Translation_rotation;
@@ -164,6 +211,7 @@ namespace Image_processing
                     ",旋转" + translation_rotation.Rotation.ToString() + "°\r\n");
             }
         }
+        #endregion
 
         #region 形态学操作
 
@@ -186,7 +234,7 @@ namespace Image_processing
                         { "Kernel", black_hat_operation.Kernel }
                     }
                 };
-                Data_List.data_list.Add(data);
+                data_List.Data_list.Add(data);
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.Black_hat_operation);
@@ -215,7 +263,7 @@ namespace Image_processing
                         { "Kernel", top_hat_operation.Kernel }
                     }
                 };
-                Data_List.data_list.Add(data);
+                data_List.Data_list.Add(data);
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.Top_hat_operation);
@@ -244,7 +292,7 @@ namespace Image_processing
                         { "Kernel", gradient_operation.Kernel }
                     }
                 };
-                Data_List.data_list.Add(data);
+                data_List.Data_list.Add(data);
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.Gradient_operation);
@@ -273,7 +321,7 @@ namespace Image_processing
                         { "Kernel", close_operation.Kernel }
                     }
                 };
-                Data_List.data_list.Add(data);
+                data_List.Data_list.Add(data);
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.Close_operation);
@@ -302,7 +350,7 @@ namespace Image_processing
                         { "Kernel", open_operation.Kernel }
                     }
                 };
-                Data_List.data_list.Add(data);
+                data_List.Data_list.Add(data);
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.Open_operation);
@@ -331,7 +379,7 @@ namespace Image_processing
                         { "Kernel", expansion.Kernel }
                     }
                 };
-                Data_List.data_list.Add(data);
+                data_List.Data_list.Add(data);
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.Expansion);
@@ -360,7 +408,7 @@ namespace Image_processing
                         { "Kernel", corrosion.Kernel }
                     }
                 };
-                Data_List.data_list.Add(data);
+                data_List.Data_list.Add(data);
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.Corrosion);
@@ -393,7 +441,7 @@ namespace Image_processing
                         { "Binarization_mode", (int)otsu.Binarization_mode },
                     }
                 };
-                Data_List.data_list.Add(data);
+                data_List.Data_list.Add(data);
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.Otsu);
@@ -420,7 +468,7 @@ namespace Image_processing
                         { "Threshold_Types",(int)adaptivethreshold.Threshold_Types}
                     }
                 };
-                Data_List.data_list.Add(data);
+                data_List.Data_list.Add(data);
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.AdaptiveThreshold);
@@ -449,7 +497,7 @@ namespace Image_processing
                         { "Binarization_mode",(int)binarization.Binarization_mode}
                     }
                 };
-                Data_List.data_list.Add(data);
+                data_List.Data_list.Add(data);
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.ToBinary);
@@ -473,7 +521,7 @@ namespace Image_processing
             {
                 int_dic = new Dictionary<string, int>() { { "Flip", (int)FlipMode.XY } }
             };
-            Data_List.data_list.Add(data);
+            data_List.Data_list.Add(data);
 
             listBox1.Items.Add(mode);
             link.AddDelegate(OpenCV.XY_Flip);
@@ -492,7 +540,7 @@ namespace Image_processing
             {
                 int_dic = new Dictionary<string, int>() { { "Flip", (int)FlipMode.Y } }
             };
-            Data_List.data_list.Add(data);
+            data_List.Data_list.Add(data);
 
             listBox1.Items.Add(mode);
             link.AddDelegate(OpenCV.Y_Flip);
@@ -510,7 +558,7 @@ namespace Image_processing
             {
                 int_dic = new Dictionary<string, int>() { { "Flip", (int)FlipMode.X } }
             };
-            Data_List.data_list.Add(data);
+            data_List.Data_list.Add(data);
 
             listBox1.Items.Add(mode);
             link.AddDelegate(OpenCV.Y_Flip);
@@ -541,7 +589,7 @@ namespace Image_processing
                         {  "SigmaSpace",bilateral_Filter.SigmaSpace}
                     }
                 };
-                Data_List.data_list.Add(data);
+                data_List.Data_list.Add(data);
 
                 listBox1.Items.Add(mode);
                 del_process Bilateral_Filter = OpenCV.Bilateral_Filter;
@@ -566,7 +614,7 @@ namespace Image_processing
                 {
                     int_dic = new Dictionary<string, int>() { { "size", median_Blur.Value } }
                 };
-                Data_List.data_list.Add(data);
+                data_List.Data_list.Add(data);
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.Median_Blur);
@@ -588,7 +636,7 @@ namespace Image_processing
                 {
                     int_dic = new Dictionary<string, int>() { { "size", mean_filter.Value } }
                 };
-                Data_List.data_list.Add(data);
+                data_List.Data_list.Add(data);
 
                 listBox1.Items.Add(mode);
                 del_process medianBlur = OpenCV.medianBlur;
@@ -612,7 +660,7 @@ namespace Image_processing
                 {
                     int_dic = new Dictionary<string, int>() { { "size", box_filter.Value } }
                 };
-                Data_List.data_list.Add(data);
+                data_List.Data_list.Add(data);
 
                 listBox1.Items.Add(mode);
                 del_process boxFilter = OpenCV.boxFilter;
@@ -637,7 +685,7 @@ namespace Image_processing
                 {
                     int_dic = new Dictionary<string, int>() { { "size", gaussian_Blur.Value } }
                 };
-                Data_List.data_list.Add(data);
+                data_List.Data_list.Add(data);
 
                 listBox1.Items.Add(mode);
                 del_process Gaussian_Blur = OpenCV.Gaussian_Blur;
@@ -664,7 +712,7 @@ namespace Image_processing
                 Data_dic data = new Data_dic();
                 data.int_dic = new Dictionary<string, int>();
                 data.int_dic.Add("ColorCode", (int)colorto.ColorCode);
-                Data_List.data_list.Add(data);
+                data_List.Data_list.Add(data);
 
                 listBox1.Items.Add(mode);
                 del_process tocolor = OpenCV.colorto;

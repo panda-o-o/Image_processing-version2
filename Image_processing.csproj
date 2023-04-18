@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <EmbeddedResource Remove="main_Form\List.resx" />
-    <EmbeddedResource Remove="main_Form\Main_form.resx" />
     <EmbeddedResource Remove="main_Form\Tree.resx" />
   </ItemGroup>
 
@@ -20,6 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="6.29.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="OpenCvSharp4" Version="4.7.0.20230115" />
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.7.0.20230115" />
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.7.0.20230115" />

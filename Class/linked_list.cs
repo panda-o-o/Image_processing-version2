@@ -1,14 +1,18 @@
 ﻿using OpenCvSharp;
 using System;
 using System.Diagnostics;
+using System.Runtime.Serialization;
 
 namespace Image_processing.Class
 {
     public delegate void del_process(ref Mat img,ref Mat mask,ref int count);
+   
     public class linked_list
     {
         // 定义一个委托链表
-        private del_process? List;
+        private del_process list;
+
+        public del_process List { get => list; set => list = value; }
 
         // 添加一个委托到链表中
         public void AddDelegate(del_process newDelegate)
@@ -119,5 +123,8 @@ namespace Image_processing.Class
                 List += del;
             }
         }
+
+
+
     }
 }
