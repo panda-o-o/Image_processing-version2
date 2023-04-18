@@ -187,7 +187,7 @@ namespace Image_processing
         /// <param name="mask"></param>
         public static void Corrosion(ref Mat img, ref Mat mask, ref int count)
         {
-            var Kernel= Main_form.data_List.Data_list[count++].mat_dic["Kernel"];
+            var Kernel = Main_form.data_List.Data_list[count++].mat_dic["Kernel"];
             Cv2.MorphologyEx(img, img, MorphTypes.Erode, Kernel);
         }
 
@@ -253,7 +253,7 @@ namespace Image_processing
         /// <param name="mask"></param>
         public static void Black_hat_operation(ref Mat img, ref Mat mask, ref int count)
         {
-           var Kernel= Main_form.data_List.Data_list[count++].mat_dic["Kernel"];
+            var Kernel = Main_form.data_List.Data_list[count++].mat_dic["Kernel"];
             Cv2.MorphologyEx(img, img, MorphTypes.BlackHat, Kernel);
         }
 
@@ -268,7 +268,7 @@ namespace Image_processing
 
             var translation_M = Main_form.data_List.Data_list[count].mat_dic["translation_M"];
             var rotation_M = Main_form.data_List.Data_list[count++].mat_dic["rotation_M"];
-            
+
             if (!translation_M.Empty())
             {
                 Cv2.WarpAffine(img, img, translation_M, img.Size());
@@ -281,48 +281,59 @@ namespace Image_processing
 
         public static void Template_Match(ref Mat img, ref Mat mask, ref int count)
         {
+            // 获取模板图像、阈值和匹配模式
             var Template = Main_form.data_List.Data_list[count].mat_dic["Template"];
             var Threshold = Main_form.data_List.Data_list[count].dou_dic["Threshold"];
             var Template_Match_Modes = Main_form.data_List.Data_list[count++].int_dic["Template_Match_Modes"];
 
-            Mat result_img= new Mat();
+            // 定义结果图像，调用OpenCV的MatchTemplate函数进行模板匹配
+            Mat result_img = new Mat();
             Cv2.MatchTemplate(img, Template, result_img, TemplateMatchModes.CCoeffNormed);
+            // 对结果图像进行归一化处理
             Cv2.Normalize(result_img, result_img, 0, 1, NormTypes.MinMax, -1, null);
 
+            // 定义一个存储匹配结果的列表
             var matches = new List<Point>();
 
+            // 根据匹配模式进行匹配
             if ((TemplateMatchModes)Template_Match_Modes == TemplateMatchModes.SqDiff || (TemplateMatchModes)Template_Match_Modes == TemplateMatchModes.SqDiffNormed)
             {
+                // 如果匹配模式为SqDiff或SqDiffNormed
                 for (int i = 0; i < result_img.Rows; i++)
                 {
                     for (int j = 0; j < result_img.Cols; j++)
                     {
                         MatType dataType = result_img.Depth();
+                        // 获取当前像素值
                         var val = result_img.At<float>(i, j);
-                        if (val <= 1-Threshold)
+                        // 如果像素值小于等于1-Threshold，则认为匹配成功，将匹配结果加入列表
+                        if (val <= 1 - Threshold)
                         {
                             matches.Add(new Point(j, i));
-
                         }
                     }
                 }
             }
             else
             {
+                // 如果匹配模式为其他模式
                 for (int i = 0; i < result_img.Rows; i++)
                 {
                     for (int j = 0; j < result_img.Cols; j++)
                     {
                         MatType dataType = result_img.Depth();
+                        // 获取当前像素值
                         var val = result_img.At<float>(i, j);
+                        // 如果像素值大于等于Threshold，则认为匹配成功，将匹配结果加入列表
                         if (val >= Threshold)
                         {
                             matches.Add(new Point(j, i));
-
                         }
                     }
                 }
             }
+
+            // 遍历匹配结果列表，将匹配区域用矩形框标注在原图像上
             foreach (var match in matches)
             {
                 Cv2.Rectangle(img, new Rect(match.X, match.Y, Template.Cols, Template.Rows), Scalar.Red, 2);

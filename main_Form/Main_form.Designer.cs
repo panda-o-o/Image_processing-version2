@@ -44,12 +44,14 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             uiNavBar1 = new Sunny.UI.UINavBar();
+            capture = new Sunny.UI.UIButton();
             refresh_pic = new Sunny.UI.UIButton();
             save_Configuration = new Sunny.UI.UIButton();
             open_Configuration = new Sunny.UI.UIButton();
             save_pic = new Sunny.UI.UIButton();
             open_pic = new Sunny.UI.UIButton();
             uiWaitingBar1 = new Sunny.UI.UIWaitingBar();
+            timer1 = new System.Windows.Forms.Timer(components);
             tree_MenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             pic_MenuStrip.SuspendLayout();
@@ -176,6 +178,7 @@
             // uiNavBar1
             // 
             uiNavBar1.BackColor = Color.White;
+            uiNavBar1.Controls.Add(capture);
             uiNavBar1.Controls.Add(refresh_pic);
             uiNavBar1.Controls.Add(save_Configuration);
             uiNavBar1.Controls.Add(open_Configuration);
@@ -194,10 +197,22 @@
             uiNavBar1.Text = "uiNavBar1";
             uiNavBar1.ZoomScaleDisabled = true;
             // 
+            // capture
+            // 
+            capture.Font = new Font("微软雅黑", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            capture.Location = new Point(329, 16);
+            capture.MinimumSize = new Size(1, 1);
+            capture.Name = "capture";
+            capture.Size = new Size(100, 35);
+            capture.Style = Sunny.UI.UIStyle.Custom;
+            capture.TabIndex = 1;
+            capture.Text = "打开摄像头";
+            capture.Click += capture_Click;
+            // 
             // refresh_pic
             // 
             refresh_pic.Font = new Font("微软雅黑", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            refresh_pic.Location = new Point(712, 16);
+            refresh_pic.Location = new Point(736, 16);
             refresh_pic.MinimumSize = new Size(1, 1);
             refresh_pic.Name = "refresh_pic";
             refresh_pic.Size = new Size(100, 35);
@@ -209,7 +224,7 @@
             // save_Configuration
             // 
             save_Configuration.Font = new Font("微软雅黑", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            save_Configuration.Location = new Point(577, 16);
+            save_Configuration.Location = new Point(605, 16);
             save_Configuration.MinimumSize = new Size(1, 1);
             save_Configuration.Name = "save_Configuration";
             save_Configuration.Size = new Size(100, 35);
@@ -221,7 +236,7 @@
             // open_Configuration
             // 
             open_Configuration.Font = new Font("微软雅黑", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            open_Configuration.Location = new Point(430, 16);
+            open_Configuration.Location = new Point(470, 16);
             open_Configuration.MinimumSize = new Size(1, 1);
             open_Configuration.Name = "open_Configuration";
             open_Configuration.Size = new Size(100, 35);
@@ -233,7 +248,7 @@
             // save_pic
             // 
             save_pic.Font = new Font("微软雅黑", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            save_pic.Location = new Point(275, 16);
+            save_pic.Location = new Point(195, 16);
             save_pic.MinimumSize = new Size(1, 1);
             save_pic.Name = "save_pic";
             save_pic.Size = new Size(100, 35);
@@ -245,7 +260,7 @@
             // open_pic
             // 
             open_pic.Font = new Font("微软雅黑", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            open_pic.Location = new Point(149, 16);
+            open_pic.Location = new Point(68, 16);
             open_pic.MinimumSize = new Size(1, 1);
             open_pic.Name = "open_pic";
             open_pic.Size = new Size(100, 35);
@@ -257,7 +272,7 @@
             // uiWaitingBar1
             // 
             uiWaitingBar1.Font = new Font("微软雅黑", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            uiWaitingBar1.Location = new Point(329, 611);
+            uiWaitingBar1.Location = new Point(319, 607);
             uiWaitingBar1.MinimumSize = new Size(70, 23);
             uiWaitingBar1.Name = "uiWaitingBar1";
             uiWaitingBar1.Size = new Size(300, 23);
@@ -265,6 +280,10 @@
             uiWaitingBar1.TabIndex = 7;
             uiWaitingBar1.Text = "uiWaitingBar1";
             uiWaitingBar1.Visible = false;
+            // 
+            // timer1
+            // 
+            timer1.Tick += timer1_Tick;
             // 
             // Main_form
             // 
@@ -324,5 +343,7 @@
         private Sunny.UI.UIButton open_pic;
         private Sunny.UI.UIWaitingBar uiWaitingBar1;
         private ToolStripMenuItem 插入ToolStripMenuItem;
+        private Sunny.UI.UIButton capture;
+        private System.Windows.Forms.Timer timer1;
     }
 }

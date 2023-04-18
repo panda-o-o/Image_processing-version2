@@ -20,6 +20,10 @@ namespace Image_processing
         public Mat mask;
         public static Mat? mat;//图片处理备份
         public static Data_List data_List;
+        private bool camera_open = false;
+        private VideoCapture? VideoCapture;
+        private Bitmap? bitmap;
+
 
         #region 窗体加载
         public Main_form()
@@ -155,6 +159,37 @@ namespace Image_processing
             }
         }
 
+        private void open_Configuration_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void save_Configuration_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void capture_Click(object sender, EventArgs e)
+        {
+            if (camera_open == false)
+            {
+                VideoCapture = new();
+                bitmap = new Bitmap(VideoCapture.FrameWidth, VideoCapture.FrameHeight, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                capture.Text = "关闭摄像头";
+                camera_open = true;
+            }
+            else
+            {
+                VideoCapture.Dispose();
+                VideoCapture = null;
+                bitmap.Dispose();
+                bitmap = null;
+                timer1.Stop();
+                capture.Text = "打开摄像头";
+                camera_open = false;
+            }
+        }
+
         /// <summary>
         /// 刷新图片
         /// </summary>
@@ -162,38 +197,49 @@ namespace Image_processing
         /// <param name="e"></param>
         private void refresh_pic_Click(object sender, EventArgs e)
         {
-            if (img.Empty())
+            if (camera_open == false)
             {
-                textBox1.AppendText("没有图片呀,处理什么呀！！！\r\n");
-                return;
+                if (img.Empty())
+                {
+                    textBox1.AppendText("没有图片呀,处理什么呀！！！\r\n");
+                    return;
+                }
+                Task.Run(() =>
+                {
+                    this.Invoke(new Action(() =>
+                    {
+                        uiWaitingBar1.Visible = true;
+                    }));
+                    Stopwatch sw = Stopwatch.StartNew();
+                    mat = img.Clone();
+                    int count = 0;
+                    link.InvokeDelegates(ref mat, ref mask, ref count);
+                    pictureBox1.Image = OpenCV.GetMat(mat);
+                    double time = sw.ElapsedMilliseconds;
+                    if (time / 1000 > 10)
+                    {
+                        time /= 1000.0;
+                        toolStripStatusLabel1.Text = "图片处理用时：" + time.ToString() + " s";
+                    }
+                    else
+                    {
+                        toolStripStatusLabel1.Text = "图片处理用时：" + time.ToString() + " ms";
+                    }
+                    this.Invoke(new Action(() =>
+                    {
+                        uiWaitingBar1.Visible = false;
+                    }));
+                });
             }
-            Task.Run(() =>
+            else
             {
-                this.Invoke(new Action(() =>
-                {
-                    uiWaitingBar1.Visible = true;
-                }));
-                Stopwatch sw = Stopwatch.StartNew();
-                mat = img.Clone();
-                int count = 0;
-                link.InvokeDelegates(ref mat, ref mask, ref count);
-                pictureBox1.Image = OpenCV.GetMat(mat);
-                double time = sw.ElapsedMilliseconds;
-                if (time / 1000 > 10)
-                {
-                    time /= 1000.0;
-                    toolStripStatusLabel1.Text = "图片处理用时：" + time.ToString() + " s";
-                }
-                else
-                {
-                    toolStripStatusLabel1.Text = "图片处理用时：" + time.ToString() + " ms";
-                }
-                this.Invoke(new Action(() =>
-                {
-                    uiWaitingBar1.Visible = false;
-                }));
-            });
+                timer1.Interval = 1000 / 30;
+                timer1.Start();
+            }
+        }
 
+        private void timer1_Tick(object sender, EventArgs e)
+        {
 
         }
         #endregion
@@ -423,15 +469,8 @@ namespace Image_processing
 
 
 
-        private void open_Configuration_Click(object sender, EventArgs e)
-        {
 
-        }
 
-        private void save_Configuration_Click(object sender, EventArgs e)
-        {
-            
-        }
     }
 
 
