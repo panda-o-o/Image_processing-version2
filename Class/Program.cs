@@ -14,7 +14,8 @@ namespace Image_processing.@class
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            Application.Run(new Main_form());
+            Main_form main_Form = new Main_form();
+            Application.Run(main_Form);
         }
     }
 }

@@ -350,6 +350,6 @@
         private ToolStripMenuItem 插入ToolStripMenuItem;
         private Sunny.UI.UIButton capture;
         private System.Windows.Forms.Timer timer1;
-        private System.Windows.Forms.Timer timer2;
+        public System.Windows.Forms.Timer timer2;
     }
 }

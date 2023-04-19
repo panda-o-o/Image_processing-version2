@@ -274,11 +274,17 @@ namespace Image_processing
                 {
                     int count = 0;
                     Mat img = frame.Clone();
-                    link.InvokeDelegates(ref img, ref mask, ref count);
-                    pictureBox1.Image?.Dispose();
-                    pictureBox1.Image = OpenCV.GetMat(img);
-                    img.Dispose();
-                    img = null;
+                    if (link.InvokeDelegates(ref img, ref mask, ref count))
+                    {
+                        pictureBox1.Image?.Dispose();
+                        pictureBox1.Image = OpenCV.GetMat(img);
+                        img.Dispose();
+                        img = null;
+                    }
+                    else
+                    {
+                        timer2.Stop();
+                    }
                 }
             }
         }

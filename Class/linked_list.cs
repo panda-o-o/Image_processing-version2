@@ -5,8 +5,8 @@ using System.Runtime.Serialization;
 
 namespace Image_processing.Class
 {
-    public delegate void del_process(ref Mat img,ref Mat mask,ref int count);
-   
+    public delegate void del_process(ref Mat img, ref Mat mask, ref int count);
+
     public class linked_list
     {
         // 定义一个委托链表
@@ -29,7 +29,7 @@ namespace Image_processing.Class
         }
 
         // 调用委托链表中的所有委托
-        public void InvokeDelegates(ref Mat img, ref Mat mask,ref int count)
+        public bool InvokeDelegates(ref Mat img, ref Mat mask, ref int count)
         {
             // 遍历委托链表中的每一个委托
             foreach (del_process del in List?.GetInvocationList() ?? Enumerable.Empty<Delegate>())
@@ -37,16 +37,17 @@ namespace Image_processing.Class
                 try
                 {
                     // 执行委托
-                    del(ref img, ref mask,ref count);
+                    del(ref img, ref mask, ref count);
                 }
                 catch (Exception ex)
                 {
                     // 记录异常信息
                     string error = $"在执行{del.Method.Name}时发生错误: \r\n{ex.Message}";
-                    MessageBox.Show(error,"提示" ,MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                    Task.Run(() => MessageBox.Show(error, "提示", MessageBoxButtons.OK, MessageBoxIcon.Error));
+                    return false;
                 }
             }
+            return true;
         }
 
         //移除指定位置的委托
