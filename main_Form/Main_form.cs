@@ -22,7 +22,6 @@ namespace Image_processing
         public static Data_List data_List;
         private bool camera_open = false;
         private VideoCapture? VideoCapture;
-        private Bitmap? bitmap;
 
 
         #region 窗体加载
@@ -176,14 +175,15 @@ namespace Image_processing
                 try
                 {
                     VideoCapture = new VideoCapture(0);
-                    bitmap = new Bitmap(VideoCapture.FrameWidth, VideoCapture.FrameHeight, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                    timer1.Interval = 1000 / 30;
+                    timer1.Start();
                     capture.Text = "关闭摄像头";
                     camera_open = true;
                 }
                 catch (Exception)
                 {
 
-                    MessageBox.Show("摄像头打开失败","错误",MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("摄像头打开失败", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
             }
@@ -191,9 +191,10 @@ namespace Image_processing
             {
                 VideoCapture.Dispose();
                 VideoCapture = null;
-                bitmap.Dispose();
-                bitmap = null;
-                timer1.Stop();
+                if (timer1.Enabled)
+                { timer1.Stop(); }
+                if (timer2.Enabled)
+                { timer2.Stop(); }
                 capture.Text = "打开摄像头";
                 camera_open = false;
             }
@@ -242,6 +243,10 @@ namespace Image_processing
             }
             else
             {
+                if (timer1.Enabled)
+                { timer1.Stop(); }
+                if (timer2.Enabled)
+                { timer2.Stop(); }
                 timer2.Interval = 1000 / 30;
                 timer2.Start();
             }
@@ -254,16 +259,28 @@ namespace Image_processing
                 VideoCapture.Read(frame);
                 if (!frame.Empty())
                 {
-                    frame.ToBitmap(bitmap);
                     pictureBox1.Image?.Dispose();
-                    pictureBox1.Image = (Bitmap)bitmap.Clone();
+                    pictureBox1.Image = OpenCV.GetMat(frame);
                 }
             }
         }
 
         private void timer2_Tick(object sender, EventArgs e)
         {
-
+            using (var frame = new Mat())
+            {
+                VideoCapture.Read(frame);
+                if (!frame.Empty())
+                {
+                    int count = 0;
+                    Mat img = frame.Clone();
+                    link.InvokeDelegates(ref img, ref mask, ref count);
+                    pictureBox1.Image?.Dispose();
+                    pictureBox1.Image = OpenCV.GetMat(img);
+                    img.Dispose();
+                    img = null;
+                }
+            }
         }
         #endregion
 
