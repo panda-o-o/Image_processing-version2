@@ -8,7 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.Json.Serialization;
 using Point = OpenCvSharp.Point;
 using System.Text.Json;
-
+using OpenCvSharp.Extensions;
 
 namespace Image_processing
 {
@@ -173,10 +173,19 @@ namespace Image_processing
         {
             if (camera_open == false)
             {
-                VideoCapture = new();
-                bitmap = new Bitmap(VideoCapture.FrameWidth, VideoCapture.FrameHeight, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-                capture.Text = "关闭摄像头";
-                camera_open = true;
+                try
+                {
+                    VideoCapture = new VideoCapture(0);
+                    bitmap = new Bitmap(VideoCapture.FrameWidth, VideoCapture.FrameHeight, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                    capture.Text = "关闭摄像头";
+                    camera_open = true;
+                }
+                catch (Exception)
+                {
+
+                    MessageBox.Show("摄像头打开失败","错误",MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
             }
             else
             {
@@ -233,12 +242,26 @@ namespace Image_processing
             }
             else
             {
-                timer1.Interval = 1000 / 30;
-                timer1.Start();
+                timer2.Interval = 1000 / 30;
+                timer2.Start();
             }
         }
 
         private void timer1_Tick(object sender, EventArgs e)
+        {
+            using (var frame = new Mat())
+            {
+                VideoCapture.Read(frame);
+                if (!frame.Empty())
+                {
+                    frame.ToBitmap(bitmap);
+                    pictureBox1.Image?.Dispose();
+                    pictureBox1.Image = (Bitmap)bitmap.Clone();
+                }
+            }
+        }
+
+        private void timer2_Tick(object sender, EventArgs e)
         {
 
         }
@@ -466,6 +489,7 @@ namespace Image_processing
         }
 
         #endregion
+
 
 
 

@@ -52,6 +52,7 @@
             open_pic = new Sunny.UI.UIButton();
             uiWaitingBar1 = new Sunny.UI.UIWaitingBar();
             timer1 = new System.Windows.Forms.Timer(components);
+            timer2 = new System.Windows.Forms.Timer(components);
             tree_MenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             pic_MenuStrip.SuspendLayout();
@@ -285,6 +286,10 @@
             // 
             timer1.Tick += timer1_Tick;
             // 
+            // timer2
+            // 
+            timer2.Tick += timer2_Tick;
+            // 
             // Main_form
             // 
             AllowAddControlOnTitle = true;
@@ -345,5 +350,6 @@
         private ToolStripMenuItem 插入ToolStripMenuItem;
         private Sunny.UI.UIButton capture;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Timer timer2;
     }
 }
