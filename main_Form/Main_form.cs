@@ -226,17 +226,17 @@ namespace Image_processing
                     link.InvokeDelegates(ref mat, ref mask, ref count);
                     pictureBox1.Image = OpenCV.GetMat(mat);
                     double time = sw.ElapsedMilliseconds;
-                    if (time / 1000 > 10)
-                    {
-                        time /= 1000.0;
-                        toolStripStatusLabel1.Text = "图片处理用时：" + time.ToString() + " s";
-                    }
-                    else
-                    {
-                        toolStripStatusLabel1.Text = "图片处理用时：" + time.ToString() + " ms";
-                    }
                     this.Invoke(new Action(() =>
                     {
+                        if (time / 1000 > 10)
+                        {
+                            time /= 1000.0;
+                            toolStripStatusLabel1.Text = "图片处理用时：" + time.ToString() + " s";
+                        }
+                        else
+                        {
+                            toolStripStatusLabel1.Text = "图片处理用时：" + time.ToString() + " ms";
+                        }
                         uiWaitingBar1.Visible = false;
                     }));
                 });
