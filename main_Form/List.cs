@@ -5,6 +5,7 @@ using Image_processing.form.平移旋转;
 using Image_processing.form.形态学操作;
 using Image_processing.form.模板匹配;
 using Image_processing.form.滤波;
+using Image_processing.form.特征识别;
 using OpenCvSharp;
 
 namespace Image_processing
@@ -43,10 +44,45 @@ namespace Image_processing
                 case ("黑帽运算"): change_black_hat_operation("黑帽运算", mode, index); break;
                 case ("平移旋转"): change_translation_rotation("平移旋转", mode, index); break;
                 case ("模板匹配"): change_template_matching("模板匹配", mode, index); break;
+                case ("特征匹配"): change_feature_matching("特征匹配", mode, index); break;
                 default:
                     // Handle the case where the element is not of any expected type
                     break;
             }
+        }
+
+        private void change_feature_matching(string v, string mode, int index)
+        {
+            Feature feature_Matching = new Feature();
+            feature_Matching.StartPosition = FormStartPosition.CenterScreen;
+            feature_Matching.ShowDialog();
+            if (mode == "修改")
+            {
+                data_List.Data_list[index].mat_dic["Template"] = feature_Matching.Template;
+                data_List.Data_list[index].mat_dic["desc2"] = feature_Matching.desc2;
+                data_List.Data_list[index].dou_dic["Threshold"] = feature_Matching.Threshold;
+
+                data_List.Data_list[index].KeyPoint_dic["kp2"] = feature_Matching.kp2;
+                data_List.Data_list[index].str_dic["mode"] = feature_Matching.Mode;
+            }
+            else if (mode == "插入")
+            {
+                Data_dic data = new Data_dic
+                {
+                    dou_dic = new Dictionary<string, double>() { { "Threshold", feature_Matching.Threshold } },
+                    int_dic = new Dictionary<string, int>() { { "HessianThreshold", feature_Matching.HessianThreshold } },
+                    str_dic = new Dictionary<string, string>() { { "mode", feature_Matching.Mode } },
+                    KeyPoint_dic = new Dictionary<string, KeyPoint[]> { { "kp2", feature_Matching.kp2 } },
+                    mat_dic = new Dictionary<string, Mat>
+                    {
+                        { "desc2", feature_Matching.desc2 },
+                        { "Template", feature_Matching.Template }
+                    }
+                };
+                data_List.Data_list.Insert(index, data);
+            }
+            textBox1.AppendText(v + mode + "成功！！！模式为：" + feature_Matching.Mode +
+                    "模板为：" + feature_Matching.Pic_name + "，阈值为：" + feature_Matching.Threshold + "\r\n");
         }
 
         private void change_template_matching(string v, string mode, int index)
@@ -79,7 +115,7 @@ namespace Image_processing
                         { "Template_Match_Modes",template_Matching.Template_Match_Modes }
                     }
                     };
-                    data_List.Data_list.Add(data);
+                    data_List.Data_list.Insert(index, data);
                 }
                 textBox1.AppendText(v + mode + "成功！！！模式为：" + template_Matching.uiComboBox1.SelectedText +
                     "模板为：" + template_Matching.Pic_name + "，置信度为：" + template_Matching.Threshold.ToString() + "\r\n");
@@ -101,7 +137,6 @@ namespace Image_processing
                 data_List.Data_list.Insert(index, data);
                 textBox1.AppendText(v + mode + "\r\n");
             }
-
         }
 
         private void change_y_axis_flip(string v, string mode, int index)
@@ -307,7 +342,6 @@ namespace Image_processing
             open_operation.ShowDialog();
             if (open_operation.DialogResult == DialogResult.OK)
             {
-
                 if (mode == "修改")
                 {
                     data_List.Data_list[index].mat_dic["Kernel"] = open_operation.Kernel;

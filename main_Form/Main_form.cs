@@ -175,7 +175,7 @@ namespace Image_processing
                 try
                 {
                     VideoCapture = new VideoCapture(0);
-                    timer1.Interval = 1000 / 30;
+                    timer1.Interval = 1000 / 3;
                     timer1.Start();
                     capture.Text = "πÿ±’…„œÒÕ∑";
                     camera_open = true;
@@ -247,7 +247,7 @@ namespace Image_processing
                 { timer1.Stop(); }
                 if (timer2.Enabled)
                 { timer2.Stop(); }
-                timer2.Interval = 1000 / 30;
+                timer2.Interval = 1000 / 3;
                 timer2.Start();
             }
         }

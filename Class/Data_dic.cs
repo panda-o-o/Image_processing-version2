@@ -17,6 +17,8 @@ namespace Image_processing.Class
         public Dictionary<string, int>? int_dic;
         public Dictionary<string, Mat>? mat_dic;
         public Dictionary<string, double>? dou_dic;
+        public Dictionary<string, string>? str_dic;
+        public Dictionary<string, KeyPoint[]>? KeyPoint_dic;
     }
 }
 

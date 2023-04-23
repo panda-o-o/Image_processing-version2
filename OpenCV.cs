@@ -3,6 +3,11 @@ using OpenCvSharp;
 using System.Drawing.Imaging;
 using Point = OpenCvSharp.Point;
 using Image_processing.main_Form;
+using static System.ComponentModel.Design.ObjectSelectorEditor;
+using OpenCvSharp.XFeatures2D;
+using Sunny.UI;
+using OpenCvSharp.Dnn;
+using Sunny.UI.Win32;
 
 namespace Image_processing
 {
@@ -293,7 +298,10 @@ namespace Image_processing
             Cv2.Normalize(result_img, result_img, 0, 1, NormTypes.MinMax, -1, null);
 
             // 定义一个存储匹配结果的列表
-            var matches = new List<Point>();
+            //var matches = new List<Point>();
+
+            // 定义一个存储匹配结果的列表
+            var matches = new List<Rect>();
 
             // 根据匹配模式进行匹配
             if ((TemplateMatchModes)Template_Match_Modes == TemplateMatchModes.SqDiff || (TemplateMatchModes)Template_Match_Modes == TemplateMatchModes.SqDiffNormed)
@@ -309,7 +317,9 @@ namespace Image_processing
                         // 如果像素值小于等于1-Threshold，则认为匹配成功，将匹配结果加入列表
                         if (val <= 1 - Threshold)
                         {
-                            matches.Add(new Point(j, i));
+                            // matches.Add(new Point(j, i));
+                            Rect rect = new Rect(j, i, Template.Cols, Template.Rows);
+                            matches.Add(rect);
                         }
                     }
                 }
@@ -327,17 +337,142 @@ namespace Image_processing
                         // 如果像素值大于等于Threshold，则认为匹配成功，将匹配结果加入列表
                         if (val >= Threshold)
                         {
-                            matches.Add(new Point(j, i));
+                            //matches.Add(new Point(j, i));
+                            Rect rect = new Rect(j, i, Template.Cols, Template.Rows);
+                            matches.Add(rect);
                         }
                     }
                 }
             }
-
-            // 遍历匹配结果列表，将匹配区域用矩形框标注在原图像上
-            foreach (var match in matches)
+            List<Rect> nmsMatches = NonMaximumSuppression(matches, 0.3);
+            //// 遍历匹配结果列表，将匹配区域用矩形框标注在原图像上
+            foreach (var match in nmsMatches)
             {
-                Cv2.Rectangle(img, new Rect(match.X, match.Y, Template.Cols, Template.Rows), Scalar.Red, 2);
+                Cv2.Rectangle(img, match, Scalar.Red, 2);
             }
         }
+
+        private static List<Rect> NonMaximumSuppression(List<Rect> rects, double overlapThreshold)
+        {
+            // 如果输入的矩形框列表为空，则直接返回该列表
+            if (rects.Count == 0)
+            {
+                return rects;
+            }
+
+            // 按置信度降序排序
+            // 排序函数使用矩形面积大小作为置信度的衡量标准
+            rects.Sort((rect1, rect2) => (rect2.Width * rect2.Height).CompareTo((rect1.Width * rect1.Height)));
+
+            // 创建一个空的输出矩形框列表和一个与输入矩形框个数相同的bool数组，用于记录每个矩形框是否被抑制
+            List<Rect> resultRects = new List<Rect>();
+            List<bool> isSuppressed = new List<bool>(new bool[rects.Count]);
+
+            // 遍历排序后的矩形框列表
+            for (int i = 0; i < rects.Count; i++)
+            {
+                // 如果当前矩形框已经被抑制，则跳过
+                if (isSuppressed[i])
+                {
+                    continue;
+                }
+
+                // 将当前未被抑制的矩形框添加到输出矩形框列表中
+                Rect currentRect = rects[i];
+                resultRects.Add(currentRect);
+
+                // 遍历剩余未被抑制的矩形框，计算其与当前矩形框的重叠度
+                for (int j = i + 1; j < rects.Count; j++)
+                {
+                    // 如果当前矩形框已经被抑制，则跳过
+                    if (isSuppressed[j])
+                    {
+                        continue;
+                    }
+
+                    // 计算当前矩形框与另一个未被抑制的矩形框的重叠区域
+                    Rect otherRect = rects[j];
+                    Rect intersection = currentRect & otherRect;
+
+                    // 计算重叠区域的面积以及两个矩形框的面积和
+                    double intersectionArea = intersection.Width * intersection.Height;
+                    double unionArea = currentRect.Width * currentRect.Height + otherRect.Width * otherRect.Height - intersectionArea;
+
+                    // 计算当前矩形框与另一个矩形框的重叠度
+                    double overlapRatio = intersectionArea / unionArea;
+
+                    // 如果重叠度大于设定的阈值，则将另一个矩形框标记为已被抑制
+                    if (overlapRatio > overlapThreshold)
+                    {
+                        isSuppressed[j] = true;
+                    }
+                }
+            }
+
+            // 返回非极大值抑制处理后的矩形框列表
+            return resultRects;
+        }
+
+
+        public static void Feature_Matching(ref Mat img, ref Mat mask, ref int count)
+        {
+            // 获取输入参数
+            var threshold = Main_form.data_List.Data_list[count].dou_dic["Threshold"];  // 获取阈值
+            var kp2 = Main_form.data_List.Data_list[count].KeyPoint_dic["kp2"];  // 获取模板的关键点
+            var desc2 = Main_form.data_List.Data_list[count].mat_dic["desc2"];  // 获取模板的特征描述符
+            var HessianThreshold = Main_form.data_List.Data_list[count].int_dic["HessianThreshold"];  // 获取SURF算法的Hessian阈值
+            var template = Main_form.data_List.Data_list[count].mat_dic["Template"];  // 获取模板图像
+            var mode = Main_form.data_List.Data_list[count++].str_dic["mode"];  // 获取特征检测算法的类型
+
+            // 根据特征检测算法的类型选择对应的特征检测器
+            Feature2D detector;
+            if (mode == "SURF")
+                detector = SURF.Create(HessianThreshold);
+            else if (mode == "ORB")
+                detector = ORB.Create();
+            else
+                throw new Exception("Invalid mode selected");
+
+            // 创建FLANN匹配器
+            using var matcher = new FlannBasedMatcher();
+
+            // 进行特征匹配
+            using (Mat desc1 = new())
+            {
+                detector.DetectAndCompute(img, null, out KeyPoint[] kp1, desc1);  // 检测输入图像的关键点和特征描述符
+                if (mode == "ORB")
+                    desc1.ConvertTo(desc1, MatType.CV_32F);
+                var knnMatches = matcher.KnnMatch(desc1, desc2, 2);  // 使用FLANN匹配器进行特征匹配
+                var goodMatches = knnMatches.Where(match => match[0].Distance < threshold * match[1].Distance).Select(m => m[0]).ToList();  // 选择好的匹配点
+
+                // 计算单应性矩阵
+                var dstPoints = goodMatches.Select(m => kp1[m.QueryIdx].Pt);  // 表示原图像点
+                var srcPoints = goodMatches.Select(m => kp2[m.TrainIdx].Pt);  // 表示模板位置
+                if (goodMatches.Count > 3)
+                {
+                    using var homography = Cv2.FindHomography(InputArray.Create(srcPoints), InputArray.Create(dstPoints), HomographyMethods.Ransac);
+                    // 从原图像到处目标图像进行矩阵变化
+                    // 对象图像的四个角点
+                    Point2f[] objCorners = {
+                    new Point2f(0, 0),
+                    new Point2f(template.Width, 0),
+                    new Point2f(template.Width, template.Height),
+                    new Point2f(0, template.Height)
+                    };
+                    // 透视变换
+                    Point2f[] sceneCorners = Cv2.PerspectiveTransform(objCorners, homography);
+
+                    // 绘制匹配结果和目标区域
+                    Mat result = new();  // 创建结果图像
+                    Cv2.DrawMatches(img, kp1, template, kp2, goodMatches, result, flags: DrawMatchesFlags.NotDrawSinglePoints);  // 绘制匹配结果
+                    Rect rect = Cv2.BoundingRect(sceneCorners);  // 计算目标区域的矩形边界
+                    Cv2.Rectangle(result, rect, new Scalar(0, 255, 0), 2);  // 绘制目标区域的矩形边界
+                    img = result.Clone();  // 将结果图像赋值给输入图像
+                }
+            }
+        }
+
+
     }
 }
+

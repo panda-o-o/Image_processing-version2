@@ -5,6 +5,7 @@ using Image_processing.form.平移旋转;
 using Image_processing.form.形态学操作;
 using Image_processing.form.模板匹配;
 using Image_processing.form.滤波;
+using Image_processing.form.特征识别;
 using OpenCvSharp;
 using Sunny.UI;
 
@@ -56,10 +57,14 @@ namespace Image_processing
                 new TreeNode("平移旋转",new []
                 {
                     new TreeNode("平移旋转"){ ToolTipText = "将图像进行旋转平移" }
-                }), 
+                }),
                 new TreeNode("模板匹配",new []
-                { 
+                {
                     new TreeNode("模板匹配"){ ToolTipText = "选择一个模板，找出匹配位置" }
+                }),
+                new TreeNode("特征匹配",new []
+                {
+                    new TreeNode("特征匹配"){ ToolTipText = "选择一个模板，进行特征匹配" }
                 })
             };
 
@@ -142,16 +147,57 @@ namespace Image_processing
                             case ("模板匹配"): Template_matching("模板匹配"); break;
                         }
                         break;
+                    case "特征匹配":
+                        switch (e.Node.Text)
+                        {
+                            case ("特征匹配"): Feature_matching("特征匹配"); break;
+                        }
+                        break;
                 }
             }
         }
 
+        private void Feature_matching(string v)
+        {
+            Feature feature_Matching = new Feature();
+            feature_Matching.StartPosition = FormStartPosition.CenterScreen;
+            feature_Matching.ShowDialog();
+            if (feature_Matching.DialogResult == DialogResult.OK)
+            {
+                Data_dic data = new Data_dic
+                {
+                    dou_dic = new Dictionary<string, double>() { { "Threshold", feature_Matching.Threshold } },
+                    int_dic = new Dictionary<string, int>() { { "HessianThreshold", feature_Matching.HessianThreshold } },
+                    str_dic = new Dictionary<string, string>() { { "mode", feature_Matching.Mode } },
+                    KeyPoint_dic = new Dictionary<string, KeyPoint[]> { { "kp2", feature_Matching.kp2 } },
+                    mat_dic = new Dictionary<string, Mat>
+                    {
+                        { "desc2", feature_Matching.desc2 },
+                        { "Template", feature_Matching.Template }
+                    }
+                };
+                data_List.Data_list.Add(data);
+
+                listBox1.Items.Add(v);
+                del_process Feature_Matching = OpenCV.Feature_Matching;
+                link.AddDelegate(Feature_Matching);
+
+                textBox1.AppendText(v + "添加成功！！！模式为：" + feature_Matching.Mode +
+                    "模板为：" + feature_Matching.Pic_name + "，阈值为：" + feature_Matching.Threshold + "\r\n");
+            }
+        }
+
+        #region 模板匹配
+        /// <summary>
+        /// 模板匹配
+        /// </summary>
+        /// <param name="v"></param>
         private void Template_matching(string v)
         {
             Template_Matching template_Matching = new Template_Matching("模板匹配");
             template_Matching.StartPosition = FormStartPosition.CenterScreen;
             template_Matching.ShowDialog();
-            if (template_Matching.DialogResult==DialogResult.OK)
+            if (template_Matching.DialogResult == DialogResult.OK)
             {
                 Data_dic data = new Data_dic
                 {
@@ -159,11 +205,11 @@ namespace Image_processing
                     {
                          { "Template", template_Matching.Template}
                     },
-                    dou_dic=new Dictionary<string, double>() 
+                    dou_dic = new Dictionary<string, double>()
                     {
                         {"Threshold", template_Matching.Threshold}
                     },
-                    int_dic=new Dictionary<string, int>()
+                    int_dic = new Dictionary<string, int>()
                     {
                         { "Template_Match_Modes",template_Matching.Template_Match_Modes }
                     }
@@ -175,10 +221,10 @@ namespace Image_processing
                 link.AddDelegate(Template_Match);
 
                 textBox1.AppendText(v + "添加成功！！！模式为：" + template_Matching.uiComboBox1.SelectedText +
-                    "模板为："+ template_Matching.Pic_name+"，置信度为：" + template_Matching.Threshold.ToString() +"\r\n");
+                    "模板为：" + template_Matching.Pic_name + "，置信度为：" + template_Matching.Threshold.ToString() + "\r\n");
             }
         }
-
+        #endregion
 
         #region 平移旋转
         /// <summary>
