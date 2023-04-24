@@ -1,4 +1,5 @@
-﻿using OpenCvSharp;
+﻿using Image_processing.Class;
+using OpenCvSharp;
 using Sunny.UI;
 using System;
 using System.Collections.Generic;
@@ -21,10 +22,26 @@ namespace Image_processing.form.模板匹配
             this.Text = v;
             addColorCode();
         }
-        public Mat Template = new Mat();
+        public Template_Matching(string v, string mode, int index)
+        {
+            InitializeComponent();
+            this.Text = v;
+            addColorCode();
+            Template = new();
+            if (mode == "修改")
+            {
+                Template = Main_form.data_List.Data_list[index].mat_dic["Template"];
+                Template_Match_Modes = Main_form.data_List.Data_list[index].int_dic["Template_Match_Modes"];
+                pictureBox1.Image?.Dispose();
+                pictureBox1.Image = OpenCV.GetMat(Template);
+                label1.Visible = false;
+            }
+
+        }
+        public Mat Template;
         private double threshold;
         private int template_Match_Modes;
-        private string pic_name;
+        private string? pic_name;
 
         private Dictionary<string, TemplateMatchModes> MatchModes = new();
         private Dictionary<string, string> remind = new();
@@ -76,7 +93,7 @@ namespace Image_processing.form.模板匹配
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string path = openFileDialog.FileName;
-                Pic_name= Path.GetFileName(path);
+                Pic_name = Path.GetFileName(path);
                 Template = new Mat(path, ImreadModes.Color);
                 if (Template.Empty())
                 {

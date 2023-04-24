@@ -15,17 +15,49 @@ namespace Image_processing.form.特征识别
 {
     public partial class Feature : UIForm
     {
+
+        public string Mode { get; set; }
+        public int HessianThreshold { get; set; }
+        public double Threshold { get; set; }
+        public KeyPoint[] kp2 { get; set; }
+        public Mat desc2 = new();
+        public Mat Template;
+        public string v { get; set; }
+
+        public string Pic_name { get; set; }
+
         public Feature()
         {
             InitializeComponent();
+            Template = new();
+        }
+        public Feature(string v, string mode, int index)
+        {
+            InitializeComponent();
+            this.Text = v;
+            Template = new();
+            if (mode == "修改")
+            {
+                Template = Main_form.data_List.Data_list[index].mat_dic["Template"];
+                uiDoubleUpDown1.Value = 1-Main_form.data_List.Data_list[index].dou_dic["Threshold"];
+                Mode = Main_form.data_List.Data_list[index].str_dic["mode"];
+                if (Mode=="SURF")
+                {
+                    uiIntegerUpDown1.Value = Main_form.data_List.Data_list[index].int_dic["HessianThreshold"];
+                }
+                pictureBox1.Image?.Dispose();
+                pictureBox1.Image = OpenCV.GetMat(Template);
+                label1.Visible = false;
+            }
+
         }
 
         private void Feature_Load(object sender, EventArgs e)
         {
             uiRichTextBox1.Text = "模式：SURF特征点提取更多，ORB提取更少\r\n" +
                 "特征点阈值：SURF的参数，关键点检测的阈值，越高监测的点越少\r\n" +
-                "正确点阈值：检测出来之后，需要对点进行判断，越小，判断为正确点的点就越少";
-            string[] keyword = { "模式", "特征点阈值", "特征点阈值" };
+                "正确点阈值：检测出来之后，需要对点进行判断，越大，判断为正确点的点就越少";
+            string[] keyword = { "模式", "特征点阈值", "正确点阈值" };
             foreach (string s in keyword)
             {
                 int index = uiRichTextBox1.Text.IndexOf(s);
@@ -51,15 +83,7 @@ namespace Image_processing.form.特征识别
             }
         }
 
-        public string Mode { get; set; }
-        public int HessianThreshold { get; set; }
-        public double Threshold { get; set; }
-        public KeyPoint[] kp2 { get; set; }
-        public Mat desc2 = new();
-        public Mat Template = new Mat();
-        public string v { get; set; }
 
-        public string Pic_name { get; set; }
 
         private void uiButton1_Click(object sender, EventArgs e)
         {
@@ -74,6 +98,11 @@ namespace Image_processing.form.特征识别
                     using (var detector = SURF.Create(HessianThreshold))
                     {
                         detector.DetectAndCompute(Template, null, out KeyPoint[] kp2, desc2);
+                        if (kp2.Length==0)
+                        {
+                            MessageBox.Show("检测不到特征点，请更换图片");
+                            return;
+                        }
                         this.kp2 = kp2;
                     }
 
@@ -123,6 +152,7 @@ namespace Image_processing.form.特征识别
                     MessageBox.Show("打开图片文件错误", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
+                pictureBox1.Image?.Dispose();
                 pictureBox1.Image = OpenCV.GetMat(Template);
                 label1.Visible = false;
             }
@@ -154,6 +184,7 @@ namespace Image_processing.form.特征识别
                     MessageBox.Show("打开图片文件错误", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
+                pictureBox1.Image?.Dispose();
                 pictureBox1.Image = OpenCV.GetMat(Template);
                 label1.Visible = false;
             }

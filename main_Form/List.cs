@@ -53,7 +53,7 @@ namespace Image_processing
 
         private void change_feature_matching(string v, string mode, int index)
         {
-            Feature feature_Matching = new Feature();
+            Feature feature_Matching = new Feature("特征匹配", mode, index);
             feature_Matching.StartPosition = FormStartPosition.CenterScreen;
             feature_Matching.ShowDialog();
             if (mode == "修改")
@@ -87,7 +87,7 @@ namespace Image_processing
 
         private void change_template_matching(string v, string mode, int index)
         {
-            Template_Matching template_Matching = new Template_Matching("模板匹配");
+            Template_Matching template_Matching = new Template_Matching("模板匹配", mode, index);
             template_Matching.StartPosition = FormStartPosition.CenterScreen;
             template_Matching.ShowDialog();
             if (template_Matching.DialogResult == DialogResult.OK)

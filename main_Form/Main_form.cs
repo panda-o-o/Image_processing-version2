@@ -102,6 +102,7 @@ namespace Image_processing
                     MessageBox.Show("打开图片文件错误", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
+                pictureBox1.Image?.Dispose();
                 pictureBox1.Image = OpenCV.GetMat(img);
             }
             return;
@@ -233,6 +234,7 @@ namespace Image_processing
                     mat = img.Clone();
                     int count = 0;
                     link.InvokeDelegates(ref mat, ref mask, ref count);
+                    pictureBox1.Image?.Dispose();
                     pictureBox1.Image = OpenCV.GetMat(mat);
                     double time = sw.ElapsedMilliseconds;
                     this.Invoke(new Action(() =>

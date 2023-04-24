@@ -166,7 +166,7 @@ namespace Image_processing
             {
                 Data_dic data = new Data_dic
                 {
-                    dou_dic = new Dictionary<string, double>() { { "Threshold", feature_Matching.Threshold } },
+                    dou_dic = new Dictionary<string, double>() { { "Threshold", 1-feature_Matching.Threshold } },
                     int_dic = new Dictionary<string, int>() { { "HessianThreshold", feature_Matching.HessianThreshold } },
                     str_dic = new Dictionary<string, string>() { { "mode", feature_Matching.Mode } },
                     KeyPoint_dic = new Dictionary<string, KeyPoint[]> { { "kp2", feature_Matching.kp2 } },

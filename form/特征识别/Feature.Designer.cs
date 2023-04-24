@@ -130,6 +130,7 @@
             // 
             // uiDoubleUpDown1
             // 
+            uiDoubleUpDown1.DecimalPlaces = 2;
             uiDoubleUpDown1.Font = new Font("微软雅黑", 12F, FontStyle.Regular, GraphicsUnit.Point);
             uiDoubleUpDown1.Location = new Point(491, 260);
             uiDoubleUpDown1.Margin = new Padding(4, 5, 4, 5);
@@ -142,7 +143,7 @@
             uiDoubleUpDown1.TabIndex = 6;
             uiDoubleUpDown1.Text = "uiDoubleUpDown1";
             uiDoubleUpDown1.TextAlignment = ContentAlignment.MiddleCenter;
-            uiDoubleUpDown1.Value = 0.8D;
+            uiDoubleUpDown1.Value = 0.75D;
             // 
             // label1
             // 

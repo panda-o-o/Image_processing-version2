@@ -73,6 +73,7 @@
             // 
             // uiDoubleUpDown1
             // 
+            uiDoubleUpDown1.DecimalPlaces = 2;
             uiDoubleUpDown1.Font = new Font("微软雅黑", 12F, FontStyle.Regular, GraphicsUnit.Point);
             uiDoubleUpDown1.Location = new Point(328, 90);
             uiDoubleUpDown1.Margin = new Padding(4, 5, 4, 5);
@@ -85,6 +86,7 @@
             uiDoubleUpDown1.TabIndex = 3;
             uiDoubleUpDown1.Text = "uiDoubleUpDown1";
             uiDoubleUpDown1.TextAlignment = ContentAlignment.MiddleCenter;
+            uiDoubleUpDown1.Value = 0.8D;
             // 
             // uiButton1
             // 
@@ -141,13 +143,13 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             ClientSize = new Size(566, 287);
+            Controls.Add(label1);
             Controls.Add(statusStrip1);
             Controls.Add(uiComboBox1);
             Controls.Add(uiButton1);
             Controls.Add(uiDoubleUpDown1);
             Controls.Add(label3);
             Controls.Add(label2);
-            Controls.Add(label1);
             Controls.Add(pictureBox1);
             Name = "Template_Matching";
             Padding = new Padding(2, 36, 2, 2);
