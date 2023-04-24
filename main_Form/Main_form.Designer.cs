@@ -201,10 +201,10 @@
             // capture
             // 
             capture.Font = new Font("微软雅黑", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            capture.Location = new Point(329, 16);
+            capture.Location = new Point(318, 16);
             capture.MinimumSize = new Size(1, 1);
             capture.Name = "capture";
-            capture.Size = new Size(100, 35);
+            capture.Size = new Size(135, 35);
             capture.Style = Sunny.UI.UIStyle.Custom;
             capture.TabIndex = 1;
             capture.Text = "打开摄像头";
@@ -213,10 +213,10 @@
             // refresh_pic
             // 
             refresh_pic.Font = new Font("微软雅黑", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            refresh_pic.Location = new Point(736, 16);
+            refresh_pic.Location = new Point(753, 16);
             refresh_pic.MinimumSize = new Size(1, 1);
             refresh_pic.Name = "refresh_pic";
-            refresh_pic.Size = new Size(100, 35);
+            refresh_pic.Size = new Size(113, 35);
             refresh_pic.Style = Sunny.UI.UIStyle.Custom;
             refresh_pic.TabIndex = 0;
             refresh_pic.Text = "刷新图片";
@@ -228,7 +228,7 @@
             save_Configuration.Location = new Point(605, 16);
             save_Configuration.MinimumSize = new Size(1, 1);
             save_Configuration.Name = "save_Configuration";
-            save_Configuration.Size = new Size(100, 35);
+            save_Configuration.Size = new Size(142, 35);
             save_Configuration.Style = Sunny.UI.UIStyle.Custom;
             save_Configuration.TabIndex = 0;
             save_Configuration.Text = "保存配置文件";
@@ -237,10 +237,10 @@
             // open_Configuration
             // 
             open_Configuration.Font = new Font("微软雅黑", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            open_Configuration.Location = new Point(470, 16);
+            open_Configuration.Location = new Point(459, 16);
             open_Configuration.MinimumSize = new Size(1, 1);
             open_Configuration.Name = "open_Configuration";
-            open_Configuration.Size = new Size(100, 35);
+            open_Configuration.Size = new Size(140, 35);
             open_Configuration.Style = Sunny.UI.UIStyle.Custom;
             open_Configuration.TabIndex = 0;
             open_Configuration.Text = "打开配置文件";
@@ -249,10 +249,10 @@
             // save_pic
             // 
             save_pic.Font = new Font("微软雅黑", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            save_pic.Location = new Point(195, 16);
+            save_pic.Location = new Point(184, 16);
             save_pic.MinimumSize = new Size(1, 1);
             save_pic.Name = "save_pic";
-            save_pic.Size = new Size(100, 35);
+            save_pic.Size = new Size(128, 35);
             save_pic.Style = Sunny.UI.UIStyle.Custom;
             save_pic.TabIndex = 0;
             save_pic.Text = "保存图片";
@@ -261,10 +261,10 @@
             // open_pic
             // 
             open_pic.Font = new Font("微软雅黑", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            open_pic.Location = new Point(68, 16);
+            open_pic.Location = new Point(57, 16);
             open_pic.MinimumSize = new Size(1, 1);
             open_pic.Name = "open_pic";
-            open_pic.Size = new Size(100, 35);
+            open_pic.Size = new Size(121, 35);
             open_pic.Style = Sunny.UI.UIStyle.Custom;
             open_pic.TabIndex = 0;
             open_pic.Text = "打开文件";

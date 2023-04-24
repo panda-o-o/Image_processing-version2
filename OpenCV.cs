@@ -459,15 +459,20 @@ namespace Image_processing
                     new Point2f(template.Width, template.Height),
                     new Point2f(0, template.Height)
                     };
-                    // 透视变换
-                    Point2f[] sceneCorners = Cv2.PerspectiveTransform(objCorners, homography);
-
-                    // 绘制匹配结果和目标区域
-                    Mat result = new();  // 创建结果图像
-                    Cv2.DrawMatches(img, kp1, template, kp2, goodMatches, result, flags: DrawMatchesFlags.NotDrawSinglePoints);  // 绘制匹配结果
-                    Rect rect = Cv2.BoundingRect(sceneCorners);  // 计算目标区域的矩形边界
-                    Cv2.Rectangle(result, rect, new Scalar(0, 255, 0), 2);  // 绘制目标区域的矩形边界
-                    img = result.Clone();  // 将结果图像赋值给输入图像
+                    try
+                    {
+                        // 透视变换
+                        Point2f[] sceneCorners = Cv2.PerspectiveTransform(objCorners, homography);
+                        // 绘制匹配结果和目标区域
+                        Mat result = new();  // 创建结果图像
+                        Cv2.DrawMatches(img, kp1, template, kp2, goodMatches, result, flags: DrawMatchesFlags.NotDrawSinglePoints);  // 绘制匹配结果
+                        Rect rect = Cv2.BoundingRect(sceneCorners);  // 计算目标区域的矩形边界
+                        Cv2.Rectangle(result, rect, new Scalar(0, 255, 0), 2);  // 绘制目标区域的矩形边界
+                        img = result.Clone();  // 将结果图像赋值给输入图像
+                    }
+                    catch (Exception)
+                    {
+                    }
                 }
             }
         }

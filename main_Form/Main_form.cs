@@ -9,6 +9,7 @@ using System.Text.Json.Serialization;
 using Point = OpenCvSharp.Point;
 using System.Text.Json;
 using OpenCvSharp.Extensions;
+using Image_processing.form.摄像头;
 
 namespace Image_processing
 {
@@ -170,15 +171,23 @@ namespace Image_processing
 
         private void capture_Click(object sender, EventArgs e)
         {
+
             if (camera_open == false)
             {
                 try
                 {
-                    VideoCapture = new VideoCapture(0);
-                    timer1.Interval = 1000 / 3;
-                    timer1.Start();
-                    capture.Text = "关闭摄像头";
-                    camera_open = true;
+                    Camera camera = new Camera();
+                    camera.StartPosition = FormStartPosition.CenterScreen;
+                    camera.ShowDialog();
+                    if (camera.DialogResult == DialogResult.OK)
+                    {
+                        VideoCapture = new VideoCapture(camera.Cameras_Id);
+                        timer1.Interval = 1000 / 30;
+                        timer1.Start();
+                        timer2.Interval = 1000 / camera.Camers_Frame_rate;
+                        capture.Text = "关闭摄像头";
+                        camera_open = true;
+                    }
                 }
                 catch (Exception)
                 {
@@ -247,7 +256,6 @@ namespace Image_processing
                 { timer1.Stop(); }
                 if (timer2.Enabled)
                 { timer2.Stop(); }
-                timer2.Interval = 1000 / 3;
                 timer2.Start();
             }
         }
