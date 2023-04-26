@@ -1,15 +1,11 @@
 using AutoWindowsSize;
 using Image_processing.Class;
+using Image_processing.form.摄像头;
 using Image_processing.main_Form;
 using OpenCvSharp;
 using Sunny.UI;
 using System.Diagnostics;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text.Json.Serialization;
 using Point = OpenCvSharp.Point;
-using System.Text.Json;
-using OpenCvSharp.Extensions;
-using Image_processing.form.摄像头;
 
 namespace Image_processing
 {
@@ -24,8 +20,8 @@ namespace Image_processing
         private bool camera_open = false;
         private VideoCapture? VideoCapture;
 
-
         #region 窗体加载
+
         public Main_form()
         {
             InitializeComponent();
@@ -46,6 +42,7 @@ namespace Image_processing
                 return cp;
             }
         }
+
         private void Main_form_SizeChanged(object sender, EventArgs e)
         {
             if (AutoSize != null)
@@ -53,6 +50,7 @@ namespace Image_processing
                 AutoSize.FormSizeChanged();
             }
         }
+
         private void Main_form_Load(object sender, EventArgs e)
         {
             if (Screen.PrimaryScreen != null)
@@ -62,10 +60,9 @@ namespace Image_processing
                                        (Screen.PrimaryScreen.WorkingArea.Height - this.Height) / 2);
             }
             tree_add();//树状图加载
-
         }
 
-        #endregion
+        #endregion 窗体加载
 
         #region 工具栏
 
@@ -83,27 +80,51 @@ namespace Image_processing
             //打开的文件选择对话框上的标题
             openFileDialog.Title = "请选择文件";
             //设置文件类型
-            openFileDialog.Filter = "jpg图片|*.JPG|gif图片|*.GIF|png图片|*.PNG|jpeg图片|*.JPEG|BMP图片|*.BMP";
+            openFileDialog.Filter = "jpg图片|*.JPG|gif图片|*.GIF|png图片|*.PNG|jpeg图片|*.JPEG|BMP图片|*.BMP|MP4文件|*.mp4|所有文件|*.*";
             //设置默认文件类型显示顺序
             openFileDialog.FilterIndex = 1;
             //保存对话框是否记忆上次打开的目录
-            openFileDialog.RestoreDirectory = true;
+            openFileDialog.RestoreDirectory = false;
             //设置是否允许多选
             openFileDialog.Multiselect = false;
             //默认打开路径
             openFileDialog.InitialDirectory = @"F:\user\Pictures\Saved Pictures";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                string path = openFileDialog.FileName;
-                string fileExtension = Path.GetExtension(path);
-                img = new Mat(path, ImreadModes.Color);
-                if (img.Empty())
+                if (VideoCapture != null)
                 {
-                    MessageBox.Show("打开图片文件错误", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                    VideoCapture.Dispose();
+                    VideoCapture = null;
                 }
-                pictureBox1.Image?.Dispose();
-                pictureBox1.Image = OpenCV.GetMat(img);
+                if (img != null)
+                {
+                    img.Dispose();
+                    img = null;
+                }
+                string path = openFileDialog.FileName;
+                string ext = Path.GetExtension(path);
+                if (ext == ".mp4" || ext == ".avi" || ext == ".mov")
+                {
+
+                    VideoCapture = new VideoCapture(path);
+
+                    if (timer1.Enabled)
+                    { timer1.Stop(); }
+                    if (timer2.Enabled)
+                    { timer2.Stop(); }
+                    timer1.Interval = 1000 / 30;
+                    timer1.Start();
+                }
+                else
+                {
+                    img = new Mat(path, ImreadModes.Color);
+                    if (img.Empty())
+                    {
+                        MessageBox.Show("打开图片文件错误", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    pictureBox1.Image = OpenCV.GetMat(img);
+                }
             }
             return;
         }
@@ -162,17 +183,14 @@ namespace Image_processing
 
         private void open_Configuration_Click(object sender, EventArgs e)
         {
-
         }
 
         private void save_Configuration_Click(object sender, EventArgs e)
         {
-
         }
 
         private void capture_Click(object sender, EventArgs e)
         {
-
             if (camera_open == false)
             {
                 try
@@ -183,6 +201,10 @@ namespace Image_processing
                     if (camera.DialogResult == DialogResult.OK)
                     {
                         VideoCapture = new VideoCapture(camera.Cameras_Id);
+                        if (timer1.Enabled)
+                        { timer1.Stop(); }
+                        if (timer2.Enabled)
+                        { timer2.Stop(); }
                         timer1.Interval = 1000 / 30;
                         timer1.Start();
                         timer2.Interval = 1000 / camera.Camers_Frame_rate;
@@ -192,10 +214,8 @@ namespace Image_processing
                 }
                 catch (Exception)
                 {
-
                     MessageBox.Show("摄像头打开失败", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
             }
             else
             {
@@ -217,7 +237,7 @@ namespace Image_processing
         /// <param name="e"></param>
         private void refresh_pic_Click(object sender, EventArgs e)
         {
-            if (camera_open == false)
+            if (camera_open == false && img != null)
             {
                 if (img.Empty())
                 {
@@ -298,58 +318,64 @@ namespace Image_processing
                 }
             }
         }
-        #endregion
+
+        #endregion 工具栏
 
         #region PictureBox
 
         private void 查看图片信息ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Image img = pictureBox1.Image;
-            if (img != null)//需要判断图片是否为空,已经是否被实例化
+            if (img != null)//需要判断图片是否为空，已经是否被实例化
             {
                 Mat mat = OpenCvSharp.Extensions.BitmapConverter.ToMat((Bitmap)img);
-                MessageBox.Show("图片宽度：" + mat.Cols + ",图片高度：" + mat.Rows +
-                    ",图片通道数：" + mat.Channels(), "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("图片宽度：" + mat.Cols + "，图片高度：" + mat.Rows +
+                    "，图片通道数：" + mat.Channels(), "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
+        private enum Graphics_
+        {
+            矩形, 直线, 圆
+        }
 
-        private Point start;//按下鼠标的起点,对应的mat对象
-        private System.Drawing.Point startPoint;
-        private System.Drawing.Point endPoint;
+        private Graphics_ shape;
 
-        // 定义画笔
-        private Pen pen = new Pen(Color.Red, 2);
-
+        public OpenCvSharp.Point ptStart = new OpenCvSharp.Point();
+        public bool mouseDown = false;
 
         /// <summary>
         /// 计算PictyreBox中真实像素点位置
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
-        private Point True_coordinate_calculation(MouseEventArgs e)
+        private Point True_coordinate_calculation(MouseEventArgs e, Mat mat)
         {
-            Image img = pictureBox1.Image;
-            if (img != null)
+            float pic_x;//
+            float pic_y;//图片在控件中的位置
+            if (mat.Width > mat.Height)
             {
-                float pic_x;//
-                float pic_y;//图片在控件中的位置
-                Mat mat = OpenCvSharp.Extensions.BitmapConverter.ToMat((Bitmap)img);
-                if (mat.Width > mat.Height)
-                {
-                    float a = pictureBox1.Width / (float)mat.Width;
-                    pic_y = (e.Y - (pictureBox1.Height - (float)mat.Height * a) / 2) * 1 / a;
-                    pic_x = e.X * 1 / a;
-                }
-                else
-                {
-                    float a = pictureBox1.Height / (float)mat.Height;
-                    pic_x = (e.X - (pictureBox1.Width - (float)mat.Width * a) / 2) * 1 / a;
-                    pic_y = e.Y * 1 / a;
-                }
-                return new Point(pic_x, pic_y);
+                float a = pictureBox1.Width / (float)mat.Width;
+                pic_y = (e.Y - (pictureBox1.Height - (float)mat.Height * a) / 2) * 1 / a;
+                pic_x = e.X * 1 / a;
             }
-            return new Point(0, 0);
+            else
+            {
+                float a = pictureBox1.Height / (float)mat.Height;
+                pic_x = (e.X - (pictureBox1.Width - (float)mat.Width * a) / 2) * 1 / a;
+                pic_y = e.Y * 1 / a;
+            }
+            return new Point(pic_x, pic_y);
+        }
+
+        private void 矩形绘制ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            shape = Graphics_.矩形;
+        }
+
+        private void 直线绘制ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            shape = Graphics_.直线;
         }
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
@@ -359,54 +385,50 @@ namespace Image_processing
             {
                 if (e.Button == MouseButtons.Left)
                 {
-
+                    mouseDown = true;
                     Mat mat = OpenCvSharp.Extensions.BitmapConverter.ToMat((Bitmap)img);
                     Point location = new Point();
-                    location = True_coordinate_calculation(e);
+                    location = True_coordinate_calculation(e, mat);
                     if (location.X < 0 || location.Y < 0 || location.X > mat.Width || location.Y > mat.Height)
                     {
                         return;
                     }
-                    start = True_coordinate_calculation(e);
-                    Vec3b bgr = mat.At<Vec3b>(location.Y, location.X);
+                    ptStart = True_coordinate_calculation(e, mat);
+                    Vec3b bgr = mat.At<Vec3b>(ptStart.Y, ptStart.X);
                     byte blue = bgr[0];   // 蓝色通道值
                     byte green = bgr[1];  // 绿色通道值
                     byte red = bgr[2];    // 红色通道值
-                    toolStripStatusLabel1.Text = "红色通道值：" + red + ",绿色通道值：" + green + ",蓝色通道值：" + blue;
-                    // 记录鼠标按下的起始点
-                    startPoint = e.Location;
+                    toolStripStatusLabel1.Text = "红色通道值：" + red + "，绿色通道值：" + green + "，蓝色通道值：" + blue;
+                    mat.Dispose();
+                    mat = null;
+                    GC.Collect();
                 }
             }
         }
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left)
+            if (mouseDown)
             {
-                // 获取PictureBox的Graphics对象
-                Graphics g = pictureBox1.CreateGraphics();
-                endPoint = e.Location;
-                // 绘制直线
-                g.DrawLine(pen, startPoint, endPoint);
+                if (e.Button == MouseButtons.Left)
+                {
+                    mat = img.Clone();
 
-            }
-        }
-        private void pictureBox1_MouseEnter(object sender, EventArgs e)
-        {
-            // 检查鼠标左键是否按下
-            if ((Control.MouseButtons & MouseButtons.Left) == MouseButtons.Left)
-            {
-                // 获取PictureBox的Graphics对象
-                Graphics g = pictureBox1.CreateGraphics();
-
-                // 获取鼠标在屏幕坐标系中的位置
-                System.Drawing.Point screenPosition = Control.MousePosition;
-
-                // 将屏幕坐标转换为相对于pictureBox1控件的坐标
-                System.Drawing.Point clientPosition = pictureBox1.PointToClient(screenPosition);
-                endPoint = clientPosition;
-                // 绘制直线
-                g.DrawLine(pen, startPoint, endPoint);
+                    Point ptEnd = True_coordinate_calculation(e, mat);
+                    if (shape == Graphics_.矩形)
+                    {
+                        Cv2.Rectangle(mat, ptStart, ptEnd, new Scalar(0, 0, 255), 2);
+                    }
+                    else if (shape == Graphics_.直线)
+                    {
+                        Cv2.Line(mat, ptStart, ptEnd, new Scalar(0, 0, 255), 2);
+                        int distance = (int)Math.Sqrt(Math.Pow(ptEnd.X - ptStart.X, 2) + Math.Pow(ptEnd.Y - ptStart.Y, 2));
+                        toolStripStatusLabel1.Text = "两点距离为：" + distance;
+                    }
+                    pictureBox1.Image?.Dispose();
+                    pictureBox1.Image = OpenCV.GetMat(mat);
+                    GC.Collect();
+                }
             }
         }
 
@@ -414,21 +436,14 @@ namespace Image_processing
         {
             if (e.Button == MouseButtons.Left)
             {
-                Image img = pictureBox1.Image;
-                if (img != null)
-                {
-                    Point location = new Point();
-                    location = True_coordinate_calculation(e);
-                    int distance = (int)Math.Sqrt(Math.Pow(location.X - start.X, 2) + Math.Pow(location.Y - start.Y, 2));
-                    toolStripStatusLabel1.Text = "两点距离为：" + distance;
-                }
+                mouseDown = false;
             }
         }
 
-
-        #endregion
+        #endregion PictureBox
 
         #region ListBox
+
         private void 删除ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (listBox1.SelectedItem != null)
@@ -440,6 +455,7 @@ namespace Image_processing
                 textBox1.AppendText(list + "删除成功\r\n");
             }
         }
+
         private void 插入ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (listBox1.SelectedItem != null)
@@ -456,7 +472,6 @@ namespace Image_processing
             }
         }
 
-
         /// <summary>
         /// 更改流程参数
         /// </summary>
@@ -469,8 +484,6 @@ namespace Image_processing
                 change_parameter();
             }
         }
-
-
 
         /// <summary>
         /// 右键菜单
@@ -496,7 +509,8 @@ namespace Image_processing
                 }
             }
         }
-        #endregion
+
+        #endregion ListBox
 
         #region tree
 
@@ -510,7 +524,6 @@ namespace Image_processing
             this.treeView1.CollapseAll();
         }
 
-
         /// <summary>
         /// 选择方法
         /// </summary>
@@ -521,14 +534,6 @@ namespace Image_processing
             switch_Method(e);
         }
 
-        #endregion
-
-
-
-
-
-
+        #endregion tree
     }
-
-
 }

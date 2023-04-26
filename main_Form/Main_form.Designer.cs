@@ -36,6 +36,8 @@
             pictureBox1 = new PictureBox();
             pic_MenuStrip = new ContextMenuStrip(components);
             查看图片信息ToolStripMenuItem = new ToolStripMenuItem();
+            矩形绘制ToolStripMenuItem = new ToolStripMenuItem();
+            直线绘制ToolStripMenuItem = new ToolStripMenuItem();
             listBox1 = new ListBox();
             listbox_MenuStrip = new ContextMenuStrip(components);
             插入ToolStripMenuItem = new ToolStripMenuItem();
@@ -102,22 +104,34 @@
             pictureBox1.TabIndex = 2;
             pictureBox1.TabStop = false;
             pictureBox1.MouseDown += pictureBox1_MouseDown;
-            pictureBox1.MouseEnter += pictureBox1_MouseEnter;
             pictureBox1.MouseMove += pictureBox1_MouseMove;
             pictureBox1.MouseUp += pictureBox1_MouseUp;
             // 
             // pic_MenuStrip
             // 
-            pic_MenuStrip.Items.AddRange(new ToolStripItem[] { 查看图片信息ToolStripMenuItem });
+            pic_MenuStrip.Items.AddRange(new ToolStripItem[] { 查看图片信息ToolStripMenuItem, 矩形绘制ToolStripMenuItem, 直线绘制ToolStripMenuItem });
             pic_MenuStrip.Name = "pic_MenuStrip";
-            pic_MenuStrip.Size = new Size(149, 26);
+            pic_MenuStrip.Size = new Size(149, 70);
             // 
             // 查看图片信息ToolStripMenuItem
             // 
             查看图片信息ToolStripMenuItem.Name = "查看图片信息ToolStripMenuItem";
             查看图片信息ToolStripMenuItem.Size = new Size(148, 22);
             查看图片信息ToolStripMenuItem.Text = "查看图片信息";
-            查看图片信息ToolStripMenuItem.Click += 查看图片信息ToolStripMenuItem_Click;
+            // 
+            // 矩形绘制ToolStripMenuItem
+            // 
+            矩形绘制ToolStripMenuItem.Name = "矩形绘制ToolStripMenuItem";
+            矩形绘制ToolStripMenuItem.Size = new Size(148, 22);
+            矩形绘制ToolStripMenuItem.Text = "矩形绘制";
+            矩形绘制ToolStripMenuItem.Click += 矩形绘制ToolStripMenuItem_Click;
+            // 
+            // 直线绘制ToolStripMenuItem
+            // 
+            直线绘制ToolStripMenuItem.Name = "直线绘制ToolStripMenuItem";
+            直线绘制ToolStripMenuItem.Size = new Size(148, 22);
+            直线绘制ToolStripMenuItem.Text = "直线绘制";
+            直线绘制ToolStripMenuItem.Click += 直线绘制ToolStripMenuItem_Click;
             // 
             // listBox1
             // 
@@ -336,8 +350,6 @@
         private ToolStripMenuItem 折叠全部ToolStripMenuItem;
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel toolStripStatusLabel1;
-        private ContextMenuStrip pic_MenuStrip;
-        private ToolStripMenuItem 查看图片信息ToolStripMenuItem;
         private ContextMenuStrip listbox_MenuStrip;
         private ToolStripMenuItem 删除ToolStripMenuItem;
         private Sunny.UI.UINavBar uiNavBar1;
@@ -351,5 +363,9 @@
         private Sunny.UI.UIButton capture;
         private System.Windows.Forms.Timer timer1;
         public System.Windows.Forms.Timer timer2;
+        private ContextMenuStrip pic_MenuStrip;
+        private ToolStripMenuItem 查看图片信息ToolStripMenuItem;
+        private ToolStripMenuItem 矩形绘制ToolStripMenuItem;
+        private ToolStripMenuItem 直线绘制ToolStripMenuItem;
     }
 }
