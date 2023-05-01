@@ -2,6 +2,7 @@ using AutoWindowsSize;
 using Image_processing.Class;
 using Image_processing.form.摄像头;
 using Image_processing.main_Form;
+using Newtonsoft.Json;
 using OpenCvSharp;
 using Sunny.UI;
 using System.Diagnostics;
@@ -183,10 +184,65 @@ namespace Image_processing
 
         private void open_Configuration_Click(object sender, EventArgs e)
         {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            //打开的文件选择对话框上的标题
+            openFileDialog.Title = "请选择文件";
+            //设置文件类型
+            openFileDialog.Filter = "Json文件|*.json";
+            //设置默认文件类型显示顺序
+            openFileDialog.FilterIndex = 1;
+            //保存对话框是否记忆上次打开的目录
+            openFileDialog.RestoreDirectory = false;
+            //设置是否允许多选
+            openFileDialog.Multiselect = false;
+            //默认打开路径
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string path = openFileDialog.FileName;
+                using (var steamRead = new StreamReader(path))
+                {
+                    var settings = new JsonSerializerSettings();
+                    settings.Converters.Add(new Data_ListJsonConverter());
+                    string? str = steamRead.ReadLine();
+                    data_List = JsonConvert.DeserializeObject<Data_List>(str, settings);
+                    foreach (var item in data_List.Combobox_list)
+                    {
+                        listBox1.Items.Add(item.ToString());
+                    }
+                }
+            }
         }
 
         private void save_Configuration_Click(object sender, EventArgs e)
         {
+            SaveFileDialog saveImageDialog = new SaveFileDialog();
+            saveImageDialog.Title = "配置保存";
+            saveImageDialog.Filter = "Json文件|*.json";//文件类型过滤,只可选择图片的类型
+            saveImageDialog.FilterIndex = 1;//设置默认文件类型显示顺序
+            saveImageDialog.FileName = "配置保存"; //设置默认文件名,可为空
+            saveImageDialog.RestoreDirectory = true; //OpenFileDialog与SaveFileDialog都有RestoreDirectory属性,这个属性默认是false,
+                                                     //打开一个文件后,那么系统默认目录就会指向刚才打开的文件。如果设为true就会使用系统默认目录
+            if (saveImageDialog.ShowDialog() == DialogResult.OK)
+            {
+                string fileName = saveImageDialog.FileName;
+                // 创建一个JsonSerializerSettings对象并添加CustomJsonConverter
+                var settings = new JsonSerializerSettings();
+                settings.Converters.Add(new Data_ListJsonConverter());
+
+                foreach (var item in listBox1.Items)
+                {
+                    data_List.Combobox_list.Add(item.ToString());
+                }
+
+
+                var json = JsonConvert.SerializeObject(data_List, settings);
+
+                using (var steamwrite = new StreamWriter(fileName))
+                {
+                    steamwrite.WriteLine(json);
+                }
+
+            }
         }
 
         private void capture_Click(object sender, EventArgs e)
