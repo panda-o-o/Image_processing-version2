@@ -55,6 +55,7 @@
             uiWaitingBar1 = new Sunny.UI.UIWaitingBar();
             timer1 = new System.Windows.Forms.Timer(components);
             timer2 = new System.Windows.Forms.Timer(components);
+            全选ToolStripMenuItem = new ToolStripMenuItem();
             tree_MenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             pic_MenuStrip.SuspendLayout();
@@ -142,6 +143,7 @@
             listBox1.Location = new Point(703, 99);
             listBox1.Margin = new Padding(8, 3, 3, 3);
             listBox1.Name = "listBox1";
+            listBox1.SelectionMode = SelectionMode.MultiExtended;
             listBox1.Size = new Size(218, 506);
             listBox1.TabIndex = 3;
             listBox1.MouseDoubleClick += listBox1_MouseDoubleClick;
@@ -149,21 +151,21 @@
             // 
             // listbox_MenuStrip
             // 
-            listbox_MenuStrip.Items.AddRange(new ToolStripItem[] { 插入ToolStripMenuItem, 删除ToolStripMenuItem });
+            listbox_MenuStrip.Items.AddRange(new ToolStripItem[] { 插入ToolStripMenuItem, 删除ToolStripMenuItem, 全选ToolStripMenuItem });
             listbox_MenuStrip.Name = "listbox_MenuStrip1";
-            listbox_MenuStrip.Size = new Size(101, 48);
+            listbox_MenuStrip.Size = new Size(181, 92);
             // 
             // 插入ToolStripMenuItem
             // 
             插入ToolStripMenuItem.Name = "插入ToolStripMenuItem";
-            插入ToolStripMenuItem.Size = new Size(100, 22);
+            插入ToolStripMenuItem.Size = new Size(180, 22);
             插入ToolStripMenuItem.Text = "插入";
             插入ToolStripMenuItem.Click += 插入ToolStripMenuItem_Click;
             // 
             // 删除ToolStripMenuItem
             // 
             删除ToolStripMenuItem.Name = "删除ToolStripMenuItem";
-            删除ToolStripMenuItem.Size = new Size(100, 22);
+            删除ToolStripMenuItem.Size = new Size(180, 22);
             删除ToolStripMenuItem.Text = "删除";
             删除ToolStripMenuItem.Click += 删除ToolStripMenuItem_Click;
             // 
@@ -304,6 +306,13 @@
             // 
             timer2.Tick += timer2_Tick;
             // 
+            // 全选ToolStripMenuItem
+            // 
+            全选ToolStripMenuItem.Name = "全选ToolStripMenuItem";
+            全选ToolStripMenuItem.Size = new Size(180, 22);
+            全选ToolStripMenuItem.Text = "全选";
+            全选ToolStripMenuItem.Click += 全选ToolStripMenuItem_Click;
+            // 
             // Main_form
             // 
             AllowAddControlOnTitle = true;
@@ -367,5 +376,6 @@
         private ToolStripMenuItem 查看图片信息ToolStripMenuItem;
         private ToolStripMenuItem 矩形绘制ToolStripMenuItem;
         private ToolStripMenuItem 直线绘制ToolStripMenuItem;
+        private ToolStripMenuItem 全选ToolStripMenuItem;
     }
 }

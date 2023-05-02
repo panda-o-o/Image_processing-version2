@@ -8,6 +8,7 @@ using OpenCvSharp;
 using Sunny.UI;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Windows.Forms;
 using Point = OpenCvSharp.Point;
 
 namespace Image_processing
@@ -541,11 +542,17 @@ namespace Image_processing
         {
             if (listBox1.SelectedItem != null)
             {
-                string? list = listBox1.SelectedItem.ToString();
-                link.RemoveDelegateAt(listBox1.SelectedIndex);
-                data_List.Data_list.RemoveAt(listBox1.SelectedIndex);
-                listBox1.Items.Remove(listBox1.SelectedItem);
-                textBox1.AppendText(list + "删除成功\r\n");
+
+                while (listBox1.SelectedItems.Count > 0)
+                {
+                    object item = listBox1.SelectedItems[0];
+                    string? list = item.ToString();
+                    link.RemoveDelegateAt(listBox1.Items.IndexOf(item));
+                    data_List.Data_list.RemoveAt(listBox1.Items.IndexOf(item));
+                    listBox1.Items.Remove(item);
+                    textBox1.AppendText(list + "删除成功\r\n");
+                }
+
             }
         }
 
@@ -562,6 +569,16 @@ namespace Image_processing
                     change_set_parameter(insert._Name, "插入", listBox1.SelectedIndex);
                     listBox1.Items.Insert(listBox1.SelectedIndex, insert._Name);
                 }
+            }
+        }
+
+
+        private void 全选ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // 选中 ListBox 控件中的所有项
+            for (int i = 0; i < listBox1.Items.Count; i++)
+            {
+                listBox1.SetSelected(i, true);
             }
         }
 
@@ -628,5 +645,6 @@ namespace Image_processing
         }
 
         #endregion tree
+
     }
 }
