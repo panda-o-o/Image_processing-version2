@@ -9,9 +9,11 @@ namespace Image_processing.Class
     {
         private List<Data_dic> data_list = new List<Data_dic>();
         private List<string> combobox_list = new List<string>();
+        private List<string> serialization = new List<string>();
 
         public List<Data_dic> Data_list { get => data_list; set => data_list = value; }
         public List<string> Combobox_list { get => combobox_list; set => combobox_list = value; }
+        public List<string> Serialization { get => serialization; set => serialization = value; }
     }
     public class Data_dic
     {
@@ -171,6 +173,16 @@ namespace Image_processing.Class
                 {
                     data_list.Combobox_list.Add((string)item);
                 }
+            }            
+            
+            // 从 JObject 中读取 combobox_list 列表并遍历它
+            var array_Delegation_list = Jobj_parent["Delegation_list"] as JArray;
+            if (array_Delegation_list != null)
+            {
+                foreach (var item in array_Delegation_list)
+                {
+                    data_list.Serialization.Add((string)item);
+                }
             }
             return data_list;
         }
@@ -267,14 +279,25 @@ namespace Image_processing.Class
                 //将这个类添加到Data_list类中的Data_list列表中
                 Data_list.Add(data_list);
             }
-
-            var combobox_list=new JArray();
+            
+            // 遍历 data 中的 Combobox_list 列表
+            var combobox_list = new JArray();
             foreach (var item in data.Combobox_list)
             {
                 combobox_list.Add(item);
             }
+
+            // 遍历 data 中的 Serialization 列表
+            var Delegation_list = new JArray();
+            foreach (var item in data.Serialization)
+            {
+                Delegation_list.Add(item);
+            }
+
+
             Jobj_parent.Add("Data_list", Data_list);
             Jobj_parent.Add("combobox_list", combobox_list);
+            Jobj_parent.Add("Delegation_list", Delegation_list);
             Jobj_parent.WriteTo(writer);
         }
     }

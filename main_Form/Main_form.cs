@@ -1,10 +1,12 @@
 using AutoWindowsSize;
 using Image_processing.Class;
+using Image_processing.form;
 using Image_processing.form.摄像头;
 using Image_processing.main_Form;
 using Newtonsoft.Json;
 using OpenCvSharp;
 using Sunny.UI;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Point = OpenCvSharp.Point;
 
@@ -17,9 +19,11 @@ namespace Image_processing
         public Mat img;
         public Mat mask;
         public static Mat? mat;//图片处理备份
-        public static Data_List data_List;
+        public static Data_List? data_List;
         private bool camera_open = false;
         private VideoCapture? VideoCapture;
+        private Dictionary<string, del_process> Delegation_Deserialization;
+        private Dictionary<del_process, string> Delegation_Serialization;
 
         #region 窗体加载
 
@@ -32,6 +36,32 @@ namespace Image_processing
             mask = new Mat();
             mat = new Mat();
             data_List = new Data_List();
+            Delegation_Deserialization = new Dictionary<string, del_process>()
+            {
+                {"colorto", OpenCV.colorto},
+                {"medianBlur", OpenCV.medianBlur},
+                {"boxFilter", OpenCV.boxFilter},
+                {"Gaussian_Blur", OpenCV.Gaussian_Blur},
+                {"Median_Blur", OpenCV.Median_Blur},
+                {"Bilateral_Filter", OpenCV.Bilateral_Filter},
+                {"X_Flip", OpenCV.X_Flip},
+                {"Y_Flip", OpenCV.Y_Flip},
+                {"XY_Flip", OpenCV.XY_Flip},
+                {"ToBinary", OpenCV.ToBinary},
+                {"AdaptiveThreshold", OpenCV.AdaptiveThreshold},
+                {"Otsu", OpenCV.Otsu},
+                {"Corrosion", OpenCV.Corrosion},
+                {"Expansion", OpenCV.Expansion},
+                {"Open_operation", OpenCV.Open_operation},
+                {"Close_operation", OpenCV.Close_operation},
+                {"Gradient_operation", OpenCV.Gradient_operation},
+                {"Top_hat_operation", OpenCV.Top_hat_operation},
+                {"Black_hat_operation", OpenCV.Black_hat_operation},
+                {"Translation_rotation", OpenCV.Translation_rotation},
+                {"Template_Match", OpenCV.Template_Match},
+                {"Feature_Matching", OpenCV.Feature_Matching}
+            };
+            Delegation_Serialization = Delegation_Deserialization.ToDictionary(pair => pair.Value, pair => pair.Key);
         }
 
         protected override CreateParams CreateParams
@@ -100,7 +130,6 @@ namespace Image_processing
                 if (img != null)
                 {
                     img.Dispose();
-                    img = null;
                 }
                 string path = openFileDialog.FileName;
                 string ext = Path.GetExtension(path);
@@ -205,9 +234,14 @@ namespace Image_processing
                     settings.Converters.Add(new Data_ListJsonConverter());
                     string? str = steamRead.ReadLine();
                     data_List = JsonConvert.DeserializeObject<Data_List>(str, settings);
-                    foreach (var item in data_List.Combobox_list)
+                    foreach (var item in data_List.Combobox_list)//加载listbox
                     {
                         listBox1.Items.Add(item.ToString());
+                    }
+
+                    foreach (var item in data_List.Serialization)//加载委托
+                    {
+                        link.AddDelegate(Delegation_Deserialization[item]);
                     }
                 }
             }
@@ -229,11 +263,14 @@ namespace Image_processing
                 var settings = new JsonSerializerSettings();
                 settings.Converters.Add(new Data_ListJsonConverter());
 
-                foreach (var item in listBox1.Items)
+                foreach (var item in listBox1.Items)//将listbox里面的字符窜进行保存
                 {
                     data_List.Combobox_list.Add(item.ToString());
                 }
-
+                foreach (del_process del in link.List?.GetInvocationList() ?? Enumerable.Empty<Delegate>())//将委托进行保存
+                {
+                    data_List.Serialization.Add(Delegation_Serialization[del]);
+                }
 
                 var json = JsonConvert.SerializeObject(data_List, settings);
 
