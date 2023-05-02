@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OpenCvSharp;
 
 namespace Image_processing.Class
