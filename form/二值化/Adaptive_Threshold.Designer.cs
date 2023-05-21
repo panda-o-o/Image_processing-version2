@@ -108,7 +108,7 @@
             Controls.Add(uiComboBox2);
             Controls.Add(uiComboBox1);
             Name = "Adaptive_Threshold";
-            Text = "Adaptive_Threshold";
+            Text = "自适应阈值";
             ZoomScaleRect = new Rectangle(15, 15, 800, 450);
             Load += Adaptive_Threshold_Load;
             ResumeLayout(false);

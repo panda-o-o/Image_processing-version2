@@ -19,7 +19,7 @@ namespace Image_processing
         private void tree_add()
         {
             TreeNode[] nodes =
-           {
+            {
                 new TreeNode("颜色空间", new[]
                 {
                     new TreeNode("颜色空间变化") { ToolTipText = "将图像从一种颜色空间转换为另一种颜色空间" }

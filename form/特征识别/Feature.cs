@@ -39,7 +39,7 @@ namespace Image_processing.form.特征识别
             if (mode == "修改")
             {
                 Template = Main_form.data_List.Data_list[index].mat_dic["Template"];
-                uiDoubleUpDown1.Value = 1-Main_form.data_List.Data_list[index].dou_dic["Threshold"];
+                uiDoubleUpDown1.Value = Main_form.data_List.Data_list[index].dou_dic["Threshold"];
                 Mode = Main_form.data_List.Data_list[index].str_dic["mode"];
                 if (Mode=="SURF")
                 {
@@ -141,7 +141,7 @@ namespace Image_processing.form.特征识别
             //设置是否允许多选
             openFileDialog.Multiselect = false;
             //默认打开路径
-            openFileDialog.InitialDirectory = @"F:\user\Pictures\Saved Pictures";
+            //openFileDialog.InitialDirectory = @"F:\user\Pictures\Saved Pictures";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string path = openFileDialog.FileName;
@@ -173,7 +173,7 @@ namespace Image_processing.form.特征识别
             //设置是否允许多选
             openFileDialog.Multiselect = false;
             //默认打开路径
-            openFileDialog.InitialDirectory = @"F:\user\Pictures\Saved Pictures";
+            //openFileDialog.InitialDirectory = @"F:\user\Pictures\Saved Pictures";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string path = openFileDialog.FileName;

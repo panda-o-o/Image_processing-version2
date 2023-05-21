@@ -57,7 +57,7 @@
             uiButton1.Name = "uiButton1";
             uiButton1.Size = new Size(100, 35);
             uiButton1.TabIndex = 1;
-            uiButton1.Text = "uiButton1";
+            uiButton1.Text = "确定";
             uiButton1.Click += uiButton1_Click;
             // 
             // uiRichTextBox1
