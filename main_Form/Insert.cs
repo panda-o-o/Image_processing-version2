@@ -50,7 +50,9 @@ namespace Image_processing.main_Form
                 ("黑帽运算", new del_process(OpenCV.Black_hat_operation)),
                 ("平移旋转",new del_process(OpenCV.Translation_rotation)),
                 ("模板匹配",new del_process(OpenCV.Template_Match)),
-                ("特征匹配",new del_process(OpenCV.Feature_Matching))
+                ("特征匹配",new del_process(OpenCV.Feature_Matching)),
+                ("Yolov5",new del_process(OpenCV.Yolov5_Detect)),
+                ("Yolov5方框绘制",new del_process(OpenCV.Yolov5_Box_drawing))
             };
             foreach (var tupe in tupes)
             {

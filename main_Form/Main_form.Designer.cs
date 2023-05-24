@@ -33,8 +33,9 @@
             tree_MenuStrip = new ContextMenuStrip(components);
             展开全部ToolStripMenuItem = new ToolStripMenuItem();
             折叠全部ToolStripMenuItem = new ToolStripMenuItem();
-            pictureBox1 = new PictureBox();
+            pictureBox_small = new PictureBox();
             pic_MenuStrip = new ContextMenuStrip(components);
+            无ToolStripMenuItem = new ToolStripMenuItem();
             查看图片信息ToolStripMenuItem = new ToolStripMenuItem();
             矩形绘制ToolStripMenuItem = new ToolStripMenuItem();
             直线绘制ToolStripMenuItem = new ToolStripMenuItem();
@@ -58,7 +59,7 @@
             timer2 = new System.Windows.Forms.Timer(components);
             pictureBox2 = new PictureBox();
             tree_MenuStrip.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox_small).BeginInit();
             pic_MenuStrip.SuspendLayout();
             listbox_MenuStrip.SuspendLayout();
             statusStrip1.SuspendLayout();
@@ -96,25 +97,33 @@
             折叠全部ToolStripMenuItem.Text = "折叠全部";
             折叠全部ToolStripMenuItem.Click += 折叠全部ToolStripMenuItem_Click;
             // 
-            // pictureBox1
+            // pictureBox_small
             // 
-            pictureBox1.BorderStyle = BorderStyle.FixedSingle;
-            pictureBox1.ContextMenuStrip = pic_MenuStrip;
-            pictureBox1.Location = new Point(674, 102);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(400, 400);
-            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox1.TabIndex = 2;
-            pictureBox1.TabStop = false;
-            pictureBox1.MouseDown += pictureBox1_MouseDown;
-            pictureBox1.MouseMove += pictureBox1_MouseMove;
-            pictureBox1.MouseUp += pictureBox1_MouseUp;
+            pictureBox_small.BorderStyle = BorderStyle.FixedSingle;
+            pictureBox_small.ContextMenuStrip = pic_MenuStrip;
+            pictureBox_small.Location = new Point(674, 102);
+            pictureBox_small.Name = "pictureBox_small";
+            pictureBox_small.Size = new Size(400, 400);
+            pictureBox_small.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox_small.TabIndex = 2;
+            pictureBox_small.TabStop = false;
+            pictureBox_small.DoubleClick += pictureBox1_DoubleClick;
+            pictureBox_small.MouseDown += pictureBox1_MouseDown;
+            pictureBox_small.MouseMove += pictureBox1_MouseMove;
+            pictureBox_small.MouseUp += pictureBox1_MouseUp;
             // 
             // pic_MenuStrip
             // 
-            pic_MenuStrip.Items.AddRange(new ToolStripItem[] { 查看图片信息ToolStripMenuItem, 矩形绘制ToolStripMenuItem, 直线绘制ToolStripMenuItem });
+            pic_MenuStrip.Items.AddRange(new ToolStripItem[] { 无ToolStripMenuItem, 查看图片信息ToolStripMenuItem, 矩形绘制ToolStripMenuItem, 直线绘制ToolStripMenuItem });
             pic_MenuStrip.Name = "pic_MenuStrip";
-            pic_MenuStrip.Size = new Size(149, 70);
+            pic_MenuStrip.Size = new Size(149, 92);
+            // 
+            // 无ToolStripMenuItem
+            // 
+            无ToolStripMenuItem.Name = "无ToolStripMenuItem";
+            无ToolStripMenuItem.Size = new Size(148, 22);
+            无ToolStripMenuItem.Text = "无";
+            无ToolStripMenuItem.Click += 无ToolStripMenuItem_Click;
             // 
             // 查看图片信息ToolStripMenuItem
             // 
@@ -336,7 +345,7 @@
             Controls.Add(textBox1);
             Controls.Add(listBox1);
             Controls.Add(pictureBox2);
-            Controls.Add(pictureBox1);
+            Controls.Add(pictureBox_small);
             Controls.Add(treeView1);
             ExtendBox = true;
             Name = "Main_form";
@@ -351,7 +360,7 @@
             Load += Main_form_Load;
             SizeChanged += Main_form_SizeChanged;
             tree_MenuStrip.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox_small).EndInit();
             pic_MenuStrip.ResumeLayout(false);
             listbox_MenuStrip.ResumeLayout(false);
             statusStrip1.ResumeLayout(false);
@@ -366,7 +375,7 @@
 
 
         private TreeView treeView1;
-        private PictureBox pictureBox1;
+        private PictureBox pictureBox_small;
         private ListBox listBox1;
         private TextBox textBox1;
         private ContextMenuStrip tree_MenuStrip;
@@ -393,5 +402,6 @@
         private ToolStripMenuItem 直线绘制ToolStripMenuItem;
         private ToolStripMenuItem 全选ToolStripMenuItem;
         private PictureBox pictureBox2;
+        private ToolStripMenuItem 无ToolStripMenuItem;
     }
 }

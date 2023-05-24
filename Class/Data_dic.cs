@@ -1,6 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Image_processing.form.Yolov5;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenCvSharp;
+using OpenCvSharp.Dnn;
 
 namespace Image_processing.Class
 {
@@ -20,8 +22,10 @@ namespace Image_processing.Class
         public Dictionary<string, int>? int_dic;
         public Dictionary<string, Mat>? mat_dic;
         public Dictionary<string, double>? dou_dic;
+        public Dictionary<string, float>? flo_dic;
         public Dictionary<string, string>? str_dic;
         public Dictionary<string, KeyPoint[]>? KeyPoint_dic;
+        public Dictionary<string, Net>? net_dic;
     }
 
     public class Data_ListJsonConverter : JsonConverter
@@ -44,7 +48,7 @@ namespace Image_processing.Class
 
             // 创建一个新的 data 对象
             var data_list = new Data_List();
-
+            string onnx_path, class_path;
             // 从 JObject 中读取 Data_list 列表并遍历它
             var array_data_list = Jobj_parent["Data_list"] as JArray;
             if (array_data_list != null)
@@ -140,6 +144,25 @@ namespace Image_processing.Class
 
                         }
                     }
+                    if (Data_dic["flo_dic"] is JObject flo_dic_obj)
+                    {
+                        data_dic.flo_dic = new Dictionary<string, float>();
+                        foreach (var item in flo_dic_obj)
+                        {
+                            try
+                            {
+                                float value = item.Value.ToObject<float>();
+                                // 将 KeyPoint 数组添加到 mat_data 中的 KeyPoint_dic 字典中
+                                data_dic.flo_dic.Add(item.Key, value);
+
+                            }
+                            catch (Exception)
+                            {
+
+                            }
+
+                        }
+                    }
 
                     // 从 JObject 中读取 str_dic 字典并遍历它
                     if (Data_dic["str_dic"] is JObject str_dic_obj)
@@ -150,7 +173,20 @@ namespace Image_processing.Class
                             try
                             {
                                 string value = item.Value.ToObject<string>();
-                                // 将 KeyPoint 数组添加到 mat_data 中的 KeyPoint_dic 字典中
+                                if(item.Key== "onnx_path")
+                                {
+                                    var Net = CvDnn.ReadNetFromOnnx(value);
+                                    Net.SetPreferableBackend(Backend.DEFAULT);
+                                    Net.SetPreferableTarget(Target.CPU);
+                                    data_dic.net_dic = new Dictionary<string, Net>() { { "Net", Net } };
+                                }
+                                else if (item.Key == "class_path")
+                                {
+                                    using StreamReader streamReader = new(value);
+                                    Main_form.public_Environment.Yolov5_class = streamReader.ReadToEnd();
+                                    var str = Main_form.public_Environment.Yolov5_class.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+                                    Main_form.public_Environment.Yolov5_list_class.AddRange(str);
+                                }
                                 data_dic.str_dic.Add(item.Key, value);
 
                             }
@@ -161,6 +197,7 @@ namespace Image_processing.Class
 
                         }
                     }
+
                     data_list.Data_list.Add(data_dic);
                 }
             }
@@ -173,8 +210,8 @@ namespace Image_processing.Class
                 {
                     data_list.Combobox_list.Add((string)item);
                 }
-            }            
-            
+            }
+
             // 从 JObject 中读取 combobox_list 列表并遍历它
             var array_Delegation_list = Jobj_parent["Delegation_list"] as JArray;
             if (array_Delegation_list != null)
@@ -224,6 +261,10 @@ namespace Image_processing.Class
                 // 创建一个新的 str_dic 字典
                 var str_dic = new JObject();
 
+                // 创建一个新的 flo_dic 字典
+                var flo_dic = new JObject();
+
+
                 if (item.mat_dic != null)
                 {
                     // 遍历 Data_list 中的 mat_dic 字典
@@ -261,6 +302,15 @@ namespace Image_processing.Class
                         dou_dic.Add(dou_dic_dic.Key, dou_dic_dic.Value);
                     }
                 }
+                if (item.flo_dic != null)
+                {
+                    // 遍历 Data_list 中的 dou_dic 字典
+                    foreach (var flo_dic_dic in item.flo_dic)
+                    {
+                        // 将 KeyPoint 数组序列化为 JToken，并将字符串和 JToken 添加到 keypoint_obj 字典中
+                        flo_dic.Add(flo_dic_dic.Key, flo_dic_dic.Value);
+                    }
+                }
                 if (item.str_dic != null)
                 {
                     foreach (var str_dic_dic in item.str_dic)
@@ -275,11 +325,12 @@ namespace Image_processing.Class
                 data_list.Add("int_dic", int_dic);
                 data_list.Add("dou_dic", dou_dic);
                 data_list.Add("str_dic", str_dic);
+                data_list.Add("flo_dic", flo_dic);
 
                 //将这个类添加到Data_list类中的Data_list列表中
                 Data_list.Add(data_list);
             }
-            
+
             // 遍历 data 中的 Combobox_list 列表
             var combobox_list = new JArray();
             foreach (var item in data.Combobox_list)

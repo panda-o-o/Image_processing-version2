@@ -1,70 +1,78 @@
-ï»¿using Image_processing.Class;
+using Image_processing.Class;
 using Image_processing.form;
-using Image_processing.form.äºŒå€¼åŒ–;
-using Image_processing.form.å¹³ç§»æ—‹è½¬;
-using Image_processing.form.å½¢æ€å­¦æ“ä½œ;
-using Image_processing.form.æ¨¡æ¿åŒ¹é…;
-using Image_processing.form.æ»¤æ³¢;
-using Image_processing.form.ç‰¹å¾è¯†åˆ«;
+using Image_processing.form.Yolov5;
+using Image_processing.form.¶şÖµ»¯;
+using Image_processing.form.Æ½ÒÆĞı×ª;
+using Image_processing.form.ĞÎÌ¬Ñ§²Ù×÷;
+using Image_processing.form.Ä£°åÆ¥Åä;
+using Image_processing.form.ÂË²¨;
+using Image_processing.form.ÌØÕ÷Ê¶±ğ;
 using OpenCvSharp;
+using OpenCvSharp.Dnn;
 using Sunny.UI;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace Image_processing
 {
     public partial class Main_form
     {
         /// <summary>
-        /// æ ‘çŠ¶å›¾æ·»åŠ èŠ‚ç‚¹
+        /// Ê÷×´Í¼Ìí¼Ó½Úµã
         /// </summary>
         private void tree_add()
         {
             TreeNode[] nodes =
             {
-                new TreeNode("é¢œè‰²ç©ºé—´", new[]
+                new TreeNode("ÑÕÉ«¿Õ¼ä", new[]
                 {
-                    new TreeNode("é¢œè‰²ç©ºé—´å˜åŒ–") { ToolTipText = "å°†å›¾åƒä»ä¸€ç§é¢œè‰²ç©ºé—´è½¬æ¢ä¸ºå¦ä¸€ç§é¢œè‰²ç©ºé—´" }
+                    new TreeNode("ÑÕÉ«¿Õ¼ä±ä»¯") { ToolTipText = "½«Í¼Ïñ´ÓÒ»ÖÖÑÕÉ«¿Õ¼ä×ª»»ÎªÁíÒ»ÖÖÑÕÉ«¿Õ¼ä" }
                 }),
-                new TreeNode("å›¾åƒæ»¤æ³¢", new[]
+                new TreeNode("Í¼ÏñÂË²¨", new[]
                 {
-                    new TreeNode("å‡å€¼æ»¤æ³¢") { ToolTipText = "å»é™¤å™ªå£°å’Œç»†èŠ‚,å¹³æ»‘å›¾åƒ" },
-                    new TreeNode("æ–¹æ¡†æ»¤æ³¢") { ToolTipText = "å»é™¤å™ªå£°å’Œç»†èŠ‚,å¹³æ»‘å›¾åƒ" },
-                    new TreeNode("é«˜æ–¯æ»¤æ³¢") { ToolTipText = "å¹³æ»‘å›¾åƒå¹¶å»é™¤å™ªå£°,ä¿ç•™å›¾åƒçš„æ•´ä½“ç»“æ„ä¿¡æ¯å’Œè¾¹ç¼˜ä¿¡æ¯" },
-                    new TreeNode("ä¸­å€¼æ»¤æ³¢") { ToolTipText = "å»é™¤å™ªå£°å’Œç»†èŠ‚,å¹³æ»‘å›¾åƒå¹¶ä¿ç•™è¾¹ç¼˜ä¿¡æ¯" },
-                    new TreeNode("åŒè¾¹æ»¤æ³¢") { ToolTipText = "å¹³æ»‘å›¾åƒå¹¶ä¿ç•™è¾¹ç¼˜ä¿¡æ¯å’Œç»†èŠ‚ä¿¡æ¯" }
+                    new TreeNode("¾ùÖµÂË²¨") { ToolTipText = "È¥³ıÔëÉùºÍÏ¸½Ú,Æ½»¬Í¼Ïñ" },
+                    new TreeNode("·½¿òÂË²¨") { ToolTipText = "È¥³ıÔëÉùºÍÏ¸½Ú,Æ½»¬Í¼Ïñ" },
+                    new TreeNode("¸ßË¹ÂË²¨") { ToolTipText = "Æ½»¬Í¼Ïñ²¢È¥³ıÔëÉù,±£ÁôÍ¼ÏñµÄÕûÌå½á¹¹ĞÅÏ¢ºÍ±ßÔµĞÅÏ¢" },
+                    new TreeNode("ÖĞÖµÂË²¨") { ToolTipText = "È¥³ıÔëÉùºÍÏ¸½Ú,Æ½»¬Í¼Ïñ²¢±£Áô±ßÔµĞÅÏ¢" },
+                    new TreeNode("Ë«±ßÂË²¨") { ToolTipText = "Æ½»¬Í¼Ïñ²¢±£Áô±ßÔµĞÅÏ¢ºÍÏ¸½ÚĞÅÏ¢" }
                 }),
-                new TreeNode("å›¾åƒç¿»è½¬", new[]
+                new TreeNode("Í¼Ïñ·­×ª", new[]
                 {
-                    new TreeNode("ä¸Šä¸‹ç¿»è½¬") { ToolTipText = "å°†å›¾åƒä¸Šä¸‹ç¿»è½¬,å¯ç”¨äºé•œåƒå›¾åƒæˆ–çº æ­£æ‹æ‘„æ—¶çš„å€’ç½®é—®é¢˜" },
-                    new TreeNode("å·¦å³ç¿»è½¬") { ToolTipText = "å°†å›¾åƒå·¦å³ç¿»è½¬,å¯ç”¨äºé•œåƒå›¾åƒæˆ–çº æ­£æ‹æ‘„æ—¶çš„å€’ç½®é—®é¢˜" },
-                    new TreeNode("å…¨ç¿»è½¬") { ToolTipText = "å°†å›¾åƒä¸Šä¸‹å·¦å³ç¿»è½¬,å¯ç”¨äºé•œåƒå›¾åƒæˆ–çº æ­£æ‹æ‘„æ—¶çš„å€’ç½®é—®é¢˜" }
+                    new TreeNode("ÉÏÏÂ·­×ª") { ToolTipText = "½«Í¼ÏñÉÏÏÂ·­×ª,¿ÉÓÃÓÚ¾µÏñÍ¼Ïñ»ò¾ÀÕıÅÄÉãÊ±µÄµ¹ÖÃÎÊÌâ" },
+                    new TreeNode("×óÓÒ·­×ª") { ToolTipText = "½«Í¼Ïñ×óÓÒ·­×ª,¿ÉÓÃÓÚ¾µÏñÍ¼Ïñ»ò¾ÀÕıÅÄÉãÊ±µÄµ¹ÖÃÎÊÌâ" },
+                    new TreeNode("È«·­×ª") { ToolTipText = "½«Í¼ÏñÉÏÏÂ×óÓÒ·­×ª,¿ÉÓÃÓÚ¾µÏñÍ¼Ïñ»ò¾ÀÕıÅÄÉãÊ±µÄµ¹ÖÃÎÊÌâ" }
                 }),
-                new TreeNode("å›¾åƒé˜ˆå€¼", new[]
+                new TreeNode("Í¼ÏñãĞÖµ", new[]
                 {
-                    new TreeNode("äºŒå€¼åŒ–") { ToolTipText = "å°†å›¾åƒæ ¹æ®é˜ˆå€¼åˆ†æˆé»‘ç™½ä¸¤éƒ¨åˆ†,å¯ç”¨äºç‰©ä½“æ£€æµ‹ã€æ–‡å­—è¯†åˆ«ç­‰ä»»åŠ¡" },
-                    new TreeNode("è‡ªé€‚åº”é˜ˆå€¼") { ToolTipText = "æ ¹æ®å›¾åƒå±€éƒ¨åŒºåŸŸå†…çš„åƒç´ å€¼åŠ¨æ€è°ƒæ•´é˜ˆå€¼,å¯ç”¨äºå¤„ç†å…‰ç…§ä¸å‡çš„å›¾åƒ" },
-                    new TreeNode("Otsuç®—æ³•") { ToolTipText = "æ ¹æ®å›¾åƒç°åº¦ç›´æ–¹å›¾è‡ªé€‚åº”è°ƒæ•´é˜ˆå€¼,å¯ç”¨äºåˆ†å‰²ç›®æ ‡å’ŒèƒŒæ™¯" }
+                    new TreeNode("¶şÖµ»¯") { ToolTipText = "½«Í¼Ïñ¸ù¾İãĞÖµ·Ö³ÉºÚ°×Á½²¿·Ö,¿ÉÓÃÓÚÎïÌå¼ì²â¡¢ÎÄ×ÖÊ¶±ğµÈÈÎÎñ" },
+                    new TreeNode("×ÔÊÊÓ¦ãĞÖµ") { ToolTipText = "¸ù¾İÍ¼Ïñ¾Ö²¿ÇøÓòÄÚµÄÏñËØÖµ¶¯Ì¬µ÷ÕûãĞÖµ,¿ÉÓÃÓÚ´¦Àí¹âÕÕ²»¾ùµÄÍ¼Ïñ" },
+                    new TreeNode("OtsuËã·¨") { ToolTipText = "¸ù¾İÍ¼Ïñ»Ò¶ÈÖ±·½Í¼×ÔÊÊÓ¦µ÷ÕûãĞÖµ,¿ÉÓÃÓÚ·Ö¸îÄ¿±êºÍ±³¾°" }
                 }),
-                new TreeNode("å½¢æ€å­¦æ“ä½œ", new[]
+                new TreeNode("ĞÎÌ¬Ñ§²Ù×÷", new[]
                 {
-                    new TreeNode("è…èš€") { ToolTipText = "å°†å›¾åƒä¸­çš„å‰æ™¯ç‰©ä½“ç¼©å°,å¯ç”¨äºå»é™¤å°ç‰©ä½“æˆ–è€…åˆ†ç¦»ç›¸é‚»ç‰©ä½“" },
-                    new TreeNode("è†¨èƒ€") { ToolTipText = "å°†å›¾åƒä¸­çš„å‰æ™¯ç‰©ä½“æ‰©å¤§,å¯ç”¨äºå¡«å……å°å­”æ´æˆ–è€…åˆå¹¶ç›¸é‚»ç‰©ä½“" },
-                    new TreeNode("å¼€è¿ç®—") { ToolTipText = "å…ˆè¿›è¡Œè…èš€æ“ä½œ,å†è¿›è¡Œè†¨èƒ€æ“ä½œ,å¯ç”¨äºå»é™¤å°ç‰©ä½“å’Œæ¯›åˆº" },
-                    new TreeNode("é—­è¿ç®—") { ToolTipText = "å…ˆè¿›è¡Œè†¨èƒ€æ“ä½œ,å†è¿›è¡Œè…èš€æ“ä½œ,å¡«å……å°å­”æ´" },
-                    new TreeNode("æ¢¯åº¦è¿ç®—") { ToolTipText = "å°†è†¨èƒ€åçš„å›¾åƒå‡å»è…èš€åçš„å›¾åƒ,å¾—åˆ°å‰æ™¯ç‰©ä½“çš„è¾¹ç¼˜è½®å»“" },
-                    new TreeNode("é¡¶å¸½è¿ç®—") { ToolTipText = "å°†åŸå›¾åƒå‡å»å¼€è¿ç®—åçš„å›¾åƒ,å¾—åˆ°å°ç‰©ä½“" },
-                    new TreeNode("é»‘å¸½è¿ç®—") { ToolTipText = "å°†é—­è¿ç®—åçš„å›¾åƒå‡å»åŸå›¾åƒ,å¾—åˆ°å°å­”æ´" }
+                    new TreeNode("¸¯Ê´") { ToolTipText = "½«Í¼ÏñÖĞµÄÇ°¾°ÎïÌåËõĞ¡,¿ÉÓÃÓÚÈ¥³ıĞ¡ÎïÌå»òÕß·ÖÀëÏàÁÚÎïÌå" },
+                    new TreeNode("ÅòÕÍ") { ToolTipText = "½«Í¼ÏñÖĞµÄÇ°¾°ÎïÌåÀ©´ó,¿ÉÓÃÓÚÌî³äĞ¡¿×¶´»òÕßºÏ²¢ÏàÁÚÎïÌå" },
+                    new TreeNode("¿ªÔËËã") { ToolTipText = "ÏÈ½øĞĞ¸¯Ê´²Ù×÷,ÔÙ½øĞĞÅòÕÍ²Ù×÷,¿ÉÓÃÓÚÈ¥³ıĞ¡ÎïÌåºÍÃ«´Ì" },
+                    new TreeNode("±ÕÔËËã") { ToolTipText = "ÏÈ½øĞĞÅòÕÍ²Ù×÷,ÔÙ½øĞĞ¸¯Ê´²Ù×÷,Ìî³äĞ¡¿×¶´" },
+                    new TreeNode("Ìİ¶ÈÔËËã") { ToolTipText = "½«ÅòÕÍºóµÄÍ¼Ïñ¼õÈ¥¸¯Ê´ºóµÄÍ¼Ïñ,µÃµ½Ç°¾°ÎïÌåµÄ±ßÔµÂÖÀª" },
+                    new TreeNode("¶¥Ã±ÔËËã") { ToolTipText = "½«Ô­Í¼Ïñ¼õÈ¥¿ªÔËËãºóµÄÍ¼Ïñ,µÃµ½Ğ¡ÎïÌå" },
+                    new TreeNode("ºÚÃ±ÔËËã") { ToolTipText = "½«±ÕÔËËãºóµÄÍ¼Ïñ¼õÈ¥Ô­Í¼Ïñ,µÃµ½Ğ¡¿×¶´" }
                  }),
-                new TreeNode("å¹³ç§»æ—‹è½¬",new []
+                new TreeNode("Æ½ÒÆĞı×ª",new []
                 {
-                    new TreeNode("å¹³ç§»æ—‹è½¬"){ ToolTipText = "å°†å›¾åƒè¿›è¡Œæ—‹è½¬å¹³ç§»" }
+                    new TreeNode("Æ½ÒÆĞı×ª"){ ToolTipText = "½«Í¼Ïñ½øĞĞĞı×ªÆ½ÒÆ" }
                 }),
-                new TreeNode("æ¨¡æ¿åŒ¹é…",new []
+                new TreeNode("Ä£°åÆ¥Åä",new []
                 {
-                    new TreeNode("æ¨¡æ¿åŒ¹é…"){ ToolTipText = "é€‰æ‹©ä¸€ä¸ªæ¨¡æ¿ï¼Œæ‰¾å‡ºåŒ¹é…ä½ç½®" }
+                    new TreeNode("Ä£°åÆ¥Åä"){ ToolTipText = "Ñ¡ÔñÒ»¸öÄ£°å£¬ÕÒ³öÆ¥ÅäÎ»ÖÃ" }
                 }),
-                new TreeNode("ç‰¹å¾åŒ¹é…",new []
+                new TreeNode("ÌØÕ÷Æ¥Åä",new []
                 {
-                    new TreeNode("ç‰¹å¾åŒ¹é…"){ ToolTipText = "é€‰æ‹©ä¸€ä¸ªæ¨¡æ¿ï¼Œè¿›è¡Œç‰¹å¾åŒ¹é…" }
+                    new TreeNode("ÌØÕ÷Æ¥Åä"){ ToolTipText = "Ñ¡ÔñÒ»¸öÄ£°å£¬½øĞĞÌØÕ÷Æ¥Åä" }
+                }),
+                new TreeNode("Yolov5",new []
+                {
+                    new TreeNode("Yolov5"){ ToolTipText = "Ñ¡ÔñÒ»¸öYolov5.onnxÄ£ĞÍ£¬½øĞĞÎïÌåÊ¶±ğ" },
+                    new TreeNode("Yolov5·½¿ò»æÖÆ"){ ToolTipText = "½øĞĞYolov5Ê¶±ğÖ®ºó£¬»æÖÆÍ¼Ïñ·½¿ò" }
                 })
             };
 
@@ -73,90 +81,166 @@ namespace Image_processing
         }
 
         /// <summary>
-        /// é€‰æ‹©å¯¹åº”çš„æ–¹æ³•
+        /// Ñ¡Ôñ¶ÔÓ¦µÄ·½·¨
         /// </summary>
         /// <param name="e"></param>
         public void switch_Method(TreeNodeMouseClickEventArgs e)
         {
-            if (e.Node.Nodes.Count == 0) // åˆ¤æ–­æ˜¯å¦ä¸ºå­èŠ‚ç‚¹
+            if (e.Node.Nodes.Count == 0) // ÅĞ¶ÏÊÇ·ñÎª×Ó½Úµã
             {
                 switch (e.Node.Parent.Text)
                 {
-                    case "é¢œè‰²ç©ºé—´":
+                    case "ÑÕÉ«¿Õ¼ä":
                         switch (e.Node.Text)
                         {
-                            case "é¢œè‰²ç©ºé—´å˜åŒ–": color_add("é¢œè‰²ç©ºé—´å˜åŒ–"); break;
+                            case "ÑÕÉ«¿Õ¼ä±ä»¯": color_add("ÑÕÉ«¿Õ¼ä±ä»¯"); break;
                             default:
                                 break;
                         }
                         break;
 
-                    case "å›¾åƒæ»¤æ³¢":
+                    case "Í¼ÏñÂË²¨":
                         switch (e.Node.Text)
                         {
-                            case "å‡å€¼æ»¤æ³¢": Mean_Filter("å‡å€¼æ»¤æ³¢"); break;
-                            case "æ–¹æ¡†æ»¤æ³¢": Box_Filter("æ–¹æ¡†æ»¤æ³¢"); break;
-                            case "é«˜æ–¯æ»¤æ³¢": Gaussian_Blur("é«˜æ–¯æ»¤æ³¢"); break;
-                            case "ä¸­å€¼æ»¤æ³¢": Median_Blur("ä¸­å€¼æ»¤æ³¢"); break;
-                            case "åŒè¾¹æ»¤æ³¢": Bilateral_Filter("åŒè¾¹æ»¤æ³¢"); break;
+                            case "¾ùÖµÂË²¨": Mean_Filter("¾ùÖµÂË²¨"); break;
+                            case "·½¿òÂË²¨": Box_Filter("·½¿òÂË²¨"); break;
+                            case "¸ßË¹ÂË²¨": Gaussian_Blur("¸ßË¹ÂË²¨"); break;
+                            case "ÖĞÖµÂË²¨": Median_Blur("ÖĞÖµÂË²¨"); break;
+                            case "Ë«±ßÂË²¨": Bilateral_Filter("Ë«±ßÂË²¨"); break;
                             default:
                                 break;
                         }
                         break;
 
-                    case "å›¾åƒç¿»è½¬":
+                    case "Í¼Ïñ·­×ª":
                         switch (e.Node.Text)
                         {
-                            case "ä¸Šä¸‹ç¿»è½¬": X_axis_flip("ä¸Šä¸‹ç¿»è½¬"); break;
-                            case "å·¦å³ç¿»è½¬": Y_axis_flip("å·¦å³ç¿»è½¬"); break;
-                            case "å…¨ç¿»è½¬": XY_axis_flip("ä¸Šä¸‹å·¦å³éƒ½ç¿»è½¬"); break;
+                            case "ÉÏÏÂ·­×ª": X_axis_flip("ÉÏÏÂ·­×ª"); break;
+                            case "×óÓÒ·­×ª": Y_axis_flip("×óÓÒ·­×ª"); break;
+                            case "È«·­×ª": XY_axis_flip("ÉÏÏÂ×óÓÒ¶¼·­×ª"); break;
                         }
                         break;
 
-                    case "å›¾åƒé˜ˆå€¼":
+                    case "Í¼ÏñãĞÖµ":
                         switch (e.Node.Text)
                         {
-                            case "äºŒå€¼åŒ–": Binarizate("äºŒå€¼åŒ–"); break;
-                            case "è‡ªé€‚åº”é˜ˆå€¼": AdaptiveThreshold("è‡ªé€‚åº”é˜ˆå€¼"); break;
-                            case "Otsuç®—æ³•": Otsu("Otsuç®—æ³•"); break;
+                            case "¶şÖµ»¯": Binarizate("¶şÖµ»¯"); break;
+                            case "×ÔÊÊÓ¦ãĞÖµ": AdaptiveThreshold("×ÔÊÊÓ¦ãĞÖµ"); break;
+                            case "OtsuËã·¨": Otsu("OtsuËã·¨"); break;
                         }
                         break;
 
-                    case "å½¢æ€å­¦æ“ä½œ":
+                    case "ĞÎÌ¬Ñ§²Ù×÷":
                         switch (e.Node.Text)
                         {
-                            case ("è…èš€"): Corrosion("è…èš€"); break;
-                            case ("è†¨èƒ€"): Expansion("è†¨èƒ€"); break;
-                            case ("å¼€è¿ç®—"): Open_operation("å¼€è¿ç®—"); break;
-                            case ("é—­è¿ç®—"): Close_operation("é—­è¿ç®—"); break;
-                            case ("æ¢¯åº¦è¿ç®—"): Gradient_operation("æ¢¯åº¦è¿ç®—"); break;
-                            case ("é¡¶å¸½è¿ç®—"): Top_hat_operation("é¡¶å¸½è¿ç®—"); break;
-                            case ("é»‘å¸½è¿ç®—"): Black_hat_operation("é»‘å¸½è¿ç®—"); break;
+                            case ("¸¯Ê´"): Corrosion("¸¯Ê´"); break;
+                            case ("ÅòÕÍ"): Expansion("ÅòÕÍ"); break;
+                            case ("¿ªÔËËã"): Open_operation("¿ªÔËËã"); break;
+                            case ("±ÕÔËËã"): Close_operation("±ÕÔËËã"); break;
+                            case ("Ìİ¶ÈÔËËã"): Gradient_operation("Ìİ¶ÈÔËËã"); break;
+                            case ("¶¥Ã±ÔËËã"): Top_hat_operation("¶¥Ã±ÔËËã"); break;
+                            case ("ºÚÃ±ÔËËã"): Black_hat_operation("ºÚÃ±ÔËËã"); break;
                         }
                         break;
 
-                    case "å¹³ç§»æ—‹è½¬":
+                    case "Æ½ÒÆĞı×ª":
                         switch (e.Node.Text)
                         {
-                            case ("å¹³ç§»æ—‹è½¬"): Translation_rotation("å¹³ç§»æ—‹è½¬"); break;
+                            case ("Æ½ÒÆĞı×ª"): Translation_rotation("Æ½ÒÆĞı×ª"); break;
                         }
                         break;
-                    case "æ¨¡æ¿åŒ¹é…":
+                    case "Ä£°åÆ¥Åä":
                         switch (e.Node.Text)
                         {
-                            case ("æ¨¡æ¿åŒ¹é…"): Template_matching("æ¨¡æ¿åŒ¹é…"); break;
+                            case ("Ä£°åÆ¥Åä"): Template_matching("Ä£°åÆ¥Åä"); break;
                         }
                         break;
-                    case "ç‰¹å¾åŒ¹é…":
+                    case "ÌØÕ÷Æ¥Åä":
                         switch (e.Node.Text)
                         {
-                            case ("ç‰¹å¾åŒ¹é…"): Feature_matching("ç‰¹å¾åŒ¹é…"); break;
+                            case ("ÌØÕ÷Æ¥Åä"): Feature_matching("ÌØÕ÷Æ¥Åä"); break;
+                        }
+                        break;
+                    case "Yolov5":
+                        switch (e.Node.Text)
+                        {
+                            case ("Yolov5"): Yolov5_matching("Yolov5"); break;
+                            case ("Yolov5·½¿ò»æÖÆ"): Yolov5_Draw("Yolov5·½¿ò»æÖÆ"); break;
                         }
                         break;
                 }
             }
         }
 
+
+
+        #region Yolov5
+        private void Yolov5_Draw(string v)
+        {
+            if (!listBox1.Items.Contains("Yolov5"))
+            {
+                MessageBox.Show("ÇëÏÈÌí¼ÓYolov5ºó£¬Ìí¼Ó¸Ã²Ù×÷");
+                return;
+            }
+            var str = public_Environment.Yolov5_class.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            public_Environment.Yolov5_list_class.AddRange( str);
+            Data_dic data = new();
+            data_List.Data_list.Add(data);
+            listBox1.Items.Add(v);
+            del_process Yolov5_Box_drawing = OpenCV.Yolov5_Box_drawing;
+            link.AddDelegate(Yolov5_Box_drawing);
+            textBox1.AppendText("Yolov5¼ì²â±ß¿ò»æÖÆ");
+        }
+
+        private void Yolov5_matching(string v)
+        {
+            Yolov5 yolov5 = new Yolov5();
+            yolov5.StartPosition = FormStartPosition.CenterScreen;
+            yolov5.ShowDialog();
+            if (yolov5.DialogResult==DialogResult.OK)
+            {
+                var onnx_path = yolov5.Onnx_path;
+                var Net = CvDnn.ReadNetFromOnnx(onnx_path);
+                Net.SetPreferableBackend(Backend.DEFAULT);
+                Net.SetPreferableTarget(Target.CPU);
+                Data_dic data = new()
+                {
+                    flo_dic = new Dictionary<string, float>()
+                    {
+                        { "Input_width" , yolov5.Input_width},
+                        { "Input_height" ,yolov5.Input_height },
+                        { "Score_threshold" ,yolov5.Score_threshold },
+                        { "Nms_threshold" ,yolov5.Nms_threshold },
+                        { "Confidence_threshold",yolov5.Confidence_threshold }
+                    },
+                    str_dic = new Dictionary<string, string>()
+                    {
+                        {"class_path",yolov5.Class_path },
+                        {"onnx_path",yolov5.Onnx_path } 
+                    },
+                    net_dic=new Dictionary<string, Net>()
+                    {
+                        {"Net",Net }
+                    }
+                };
+                public_Environment.Yolov5_class = yolov5.Class_list;
+                data_List.Data_list.Add(data);
+
+                listBox1.Items.Add(v);
+                del_process yolov5_Detect = OpenCV.Yolov5_Detect;
+                link.AddDelegate(yolov5_Detect);
+                textBox1.AppendText(v + "Ìí¼Ó³É¹¦£¡£¡£¡Àà±ğµÃ·ÖãĞÖµÎª£º" + yolov5.Score_threshold +
+                    "·Ç¼«´óÖµÒÖÖÆãĞÖµ£º" + yolov5.Nms_threshold + "£¬ÖÃĞÅ¶ÈãĞÖµÎª£º" + yolov5.Confidence_threshold + "\r\n");
+            }
+        }
+        #endregion
+
+
+        #region ÌØÕ÷Æ¥Åä
+        /// <summary>
+        /// ÌØÕ÷Æ¥Åä
+        /// </summary>
+        /// <param name="v"></param>
         private void Feature_matching(string v)
         {
             Feature feature_Matching = new Feature();
@@ -166,7 +250,7 @@ namespace Image_processing
             {
                 Data_dic data = new Data_dic
                 {
-                    dou_dic = new Dictionary<string, double>() { { "Threshold", 1-feature_Matching.Threshold } },
+                    dou_dic = new Dictionary<string, double>() { { "Threshold", 1 - feature_Matching.Threshold } },
                     int_dic = new Dictionary<string, int>() { { "HessianThreshold", feature_Matching.HessianThreshold } },
                     str_dic = new Dictionary<string, string>() { { "mode", feature_Matching.Mode } },
                     KeyPoint_dic = new Dictionary<string, KeyPoint[]> { { "kp2", feature_Matching.kp2 } },
@@ -182,19 +266,21 @@ namespace Image_processing
                 del_process Feature_Matching = OpenCV.Feature_Matching;
                 link.AddDelegate(Feature_Matching);
 
-                textBox1.AppendText(v + "æ·»åŠ æˆåŠŸï¼ï¼ï¼æ¨¡å¼ä¸ºï¼š" + feature_Matching.Mode +
-                    "æ¨¡æ¿ä¸ºï¼š" + feature_Matching.Pic_name + "ï¼Œé˜ˆå€¼ä¸ºï¼š" + feature_Matching.Threshold + "\r\n");
+                textBox1.AppendText(v + "Ìí¼Ó³É¹¦£¡£¡£¡Ä£Ê½Îª£º" + feature_Matching.Mode +
+                    "Ä£°åÎª£º" + feature_Matching.Pic_name + "£¬ãĞÖµÎª£º" + feature_Matching.Threshold + "\r\n");
             }
         }
 
-        #region æ¨¡æ¿åŒ¹é…
+        #endregion
+
+        #region Ä£°åÆ¥Åä
         /// <summary>
-        /// æ¨¡æ¿åŒ¹é…
+        /// Ä£°åÆ¥Åä
         /// </summary>
         /// <param name="v"></param>
         private void Template_matching(string v)
         {
-            Template_Matching template_Matching = new Template_Matching("æ¨¡æ¿åŒ¹é…");
+            Template_Matching template_Matching = new Template_Matching("Ä£°åÆ¥Åä");
             template_Matching.StartPosition = FormStartPosition.CenterScreen;
             template_Matching.ShowDialog();
             if (template_Matching.DialogResult == DialogResult.OK)
@@ -220,20 +306,20 @@ namespace Image_processing
                 del_process Template_Match = OpenCV.Template_Match;
                 link.AddDelegate(Template_Match);
 
-                textBox1.AppendText(v + "æ·»åŠ æˆåŠŸï¼ï¼ï¼æ¨¡å¼ä¸ºï¼š" + template_Matching.uiComboBox1.SelectedText +
-                    "æ¨¡æ¿ä¸ºï¼š" + template_Matching.Pic_name + "ï¼Œç½®ä¿¡åº¦ä¸ºï¼š" + template_Matching.Threshold.ToString() + "\r\n");
+                textBox1.AppendText(v + "Ìí¼Ó³É¹¦£¡£¡£¡Ä£Ê½Îª£º" + template_Matching.uiComboBox1.SelectedText +
+                    "Ä£°åÎª£º" + template_Matching.Pic_name + "£¬ÖÃĞÅ¶ÈÎª£º" + template_Matching.Threshold.ToString() + "\r\n");
             }
         }
         #endregion
 
-        #region å¹³ç§»æ—‹è½¬
+        #region Æ½ÒÆĞı×ª
         /// <summary>
-        /// å¹³ç§»æ—‹è½¬
+        /// Æ½ÒÆĞı×ª
         /// </summary>
         /// <param name="v"></param>
         private void Translation_rotation(string v)
         {
-            Translation_rotation translation_rotation = new Translation_rotation("å¹³ç§»æ—‹è½¬");
+            Translation_rotation translation_rotation = new Translation_rotation("Æ½ÒÆĞı×ª");
             translation_rotation.StartPosition = FormStartPosition.CenterScreen;
             translation_rotation.ShowDialog();
             if (translation_rotation.DialogResult == DialogResult.OK)
@@ -252,23 +338,23 @@ namespace Image_processing
                 del_process Translation_rotation = OpenCV.Translation_rotation;
                 link.AddDelegate(Translation_rotation);
 
-                textBox1.AppendText(v + "æ·»åŠ æˆåŠŸï¼ï¼ï¼Xå¹³ç§»" + translation_rotation.Translation_X.ToString() +
-                    ",Yå¹³ç§»" + translation_rotation.Translation_Y.ToString() +
-                    ",æ—‹è½¬" + translation_rotation.Rotation.ToString() + "Â°\r\n");
+                textBox1.AppendText(v + "Ìí¼Ó³É¹¦£¡£¡£¡XÆ½ÒÆ" + translation_rotation.Translation_X.ToString() +
+                    ",YÆ½ÒÆ" + translation_rotation.Translation_Y.ToString() +
+                    ",Ğı×ª" + translation_rotation.Rotation.ToString() + "¡ã\r\n");
             }
         }
         #endregion
 
-        #region å½¢æ€å­¦æ“ä½œ
+        #region ĞÎÌ¬Ñ§²Ù×÷
 
         /// <summary>
-        /// é»‘å¸½è¿ç®—
+        /// ºÚÃ±ÔËËã
         /// </summary>
         /// <param name="mode"></param>
         /// <exception cref="NotImplementedException"></exception>
         private void Black_hat_operation(string mode)
         {
-            Morphological_operation black_hat_operation = new Morphological_operation("é»‘å¸½è¿ç®—");
+            Morphological_operation black_hat_operation = new Morphological_operation("ºÚÃ±ÔËËã");
             black_hat_operation.StartPosition = FormStartPosition.CenterScreen;
             black_hat_operation.ShowDialog();
             if (black_hat_operation.DialogResult == DialogResult.OK)
@@ -284,20 +370,20 @@ namespace Image_processing
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.Black_hat_operation);
-                textBox1.AppendText(mode + "æ·»åŠ æˆåŠŸï¼ï¼ï¼æ ¸å½¢çŠ¶ä¸ºä¸ºï¼š" + black_hat_operation.kernel_shape.ToString() +
-                    ",å®½åº¦ä¸ºï¼š" + black_hat_operation.kernel_width.ToString() +
-                    ",é«˜åº¦ä¸ºï¼š" + black_hat_operation.kernel_height.ToString() + "\r\n");
+                textBox1.AppendText(mode + "Ìí¼Ó³É¹¦£¡£¡£¡ºËĞÎ×´ÎªÎª£º" + black_hat_operation.kernel_shape.ToString() +
+                    ",¿í¶ÈÎª£º" + black_hat_operation.kernel_width.ToString() +
+                    ",¸ß¶ÈÎª£º" + black_hat_operation.kernel_height.ToString() + "\r\n");
             }
         }
 
         /// <summary>
-        /// é¡¶å¸½è¿ç®—
+        /// ¶¥Ã±ÔËËã
         /// </summary>
         /// <param name="mode"></param>
         /// <exception cref="NotImplementedException"></exception>
         private void Top_hat_operation(string mode)
         {
-            Morphological_operation top_hat_operation = new Morphological_operation("é¡¶å¸½è¿ç®—");
+            Morphological_operation top_hat_operation = new Morphological_operation("¶¥Ã±ÔËËã");
             top_hat_operation.StartPosition = FormStartPosition.CenterScreen;
             top_hat_operation.ShowDialog();
             if (top_hat_operation.DialogResult == DialogResult.OK)
@@ -313,20 +399,20 @@ namespace Image_processing
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.Top_hat_operation);
-                textBox1.AppendText(mode + "æ·»åŠ æˆåŠŸï¼ï¼ï¼æ ¸å½¢çŠ¶ä¸ºä¸ºï¼š" + top_hat_operation.kernel_shape.ToString() +
-                    ",å®½åº¦ä¸ºï¼š" + top_hat_operation.kernel_width.ToString() +
-                    ",é«˜åº¦ä¸ºï¼š" + top_hat_operation.kernel_height.ToString() + "\r\n");
+                textBox1.AppendText(mode + "Ìí¼Ó³É¹¦£¡£¡£¡ºËĞÎ×´ÎªÎª£º" + top_hat_operation.kernel_shape.ToString() +
+                    ",¿í¶ÈÎª£º" + top_hat_operation.kernel_width.ToString() +
+                    ",¸ß¶ÈÎª£º" + top_hat_operation.kernel_height.ToString() + "\r\n");
             }
         }
 
         /// <summary>
-        /// æ¢¯åº¦è¿ç®—
+        /// Ìİ¶ÈÔËËã
         /// </summary>
         /// <param name="v"></param>
         /// <exception cref="NotImplementedException"></exception>
         private void Gradient_operation(string mode)
         {
-            Morphological_operation gradient_operation = new Morphological_operation("æ¢¯åº¦è¿ç®—");
+            Morphological_operation gradient_operation = new Morphological_operation("Ìİ¶ÈÔËËã");
             gradient_operation.StartPosition = FormStartPosition.CenterScreen;
             gradient_operation.ShowDialog();
             if (gradient_operation.DialogResult == DialogResult.OK)
@@ -342,20 +428,20 @@ namespace Image_processing
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.Gradient_operation);
-                textBox1.AppendText(mode + "æ·»åŠ æˆåŠŸï¼ï¼ï¼æ ¸å½¢çŠ¶ä¸ºä¸ºï¼š" + gradient_operation.kernel_shape.ToString() +
-                    ",å®½åº¦ä¸ºï¼š" + gradient_operation.kernel_width.ToString() +
-                    ",é«˜åº¦ä¸ºï¼š" + gradient_operation.kernel_height.ToString() + "\r\n");
+                textBox1.AppendText(mode + "Ìí¼Ó³É¹¦£¡£¡£¡ºËĞÎ×´ÎªÎª£º" + gradient_operation.kernel_shape.ToString() +
+                    ",¿í¶ÈÎª£º" + gradient_operation.kernel_width.ToString() +
+                    ",¸ß¶ÈÎª£º" + gradient_operation.kernel_height.ToString() + "\r\n");
             }
         }
 
         /// <summary>
-        /// é—­è¿ç®—
+        /// ±ÕÔËËã
         /// </summary>
         /// <param name="mode"></param>
         /// <exception cref="NotImplementedException"></exception>
         private void Close_operation(string mode)
         {
-            Morphological_operation close_operation = new Morphological_operation("é—­è¿ç®—");
+            Morphological_operation close_operation = new Morphological_operation("±ÕÔËËã");
             close_operation.StartPosition = FormStartPosition.CenterScreen;
             close_operation.ShowDialog();
             if (close_operation.DialogResult == DialogResult.OK)
@@ -371,20 +457,20 @@ namespace Image_processing
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.Close_operation);
-                textBox1.AppendText(mode + "æ·»åŠ æˆåŠŸï¼ï¼ï¼æ ¸å½¢çŠ¶ä¸ºä¸ºï¼š" + close_operation.kernel_shape.ToString() +
-                    ",å®½åº¦ä¸ºï¼š" + close_operation.kernel_width.ToString() +
-                    ",é«˜åº¦ä¸ºï¼š" + close_operation.kernel_height.ToString() + "\r\n");
+                textBox1.AppendText(mode + "Ìí¼Ó³É¹¦£¡£¡£¡ºËĞÎ×´ÎªÎª£º" + close_operation.kernel_shape.ToString() +
+                    ",¿í¶ÈÎª£º" + close_operation.kernel_width.ToString() +
+                    ",¸ß¶ÈÎª£º" + close_operation.kernel_height.ToString() + "\r\n");
             }
         }
 
         /// <summary>
-        /// å¼€è¿ç®—
+        /// ¿ªÔËËã
         /// </summary>
         /// <param name="mode"></param>
         /// <exception cref="NotImplementedException"></exception>
         private void Open_operation(string mode)
         {
-            Morphological_operation open_operation = new Morphological_operation("å¼€è¿ç®—");
+            Morphological_operation open_operation = new Morphological_operation("¿ªÔËËã");
             open_operation.StartPosition = FormStartPosition.CenterScreen;
             open_operation.ShowDialog();
             if (open_operation.DialogResult == DialogResult.OK)
@@ -400,20 +486,20 @@ namespace Image_processing
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.Open_operation);
-                textBox1.AppendText(mode + "æ·»åŠ æˆåŠŸï¼ï¼ï¼æ ¸å½¢çŠ¶ä¸ºä¸ºï¼š" + open_operation.kernel_shape.ToString() +
-                    ",å®½åº¦ä¸ºï¼š" + open_operation.kernel_width.ToString() +
-                    ",é«˜åº¦ä¸ºï¼š" + open_operation.kernel_height.ToString() + "\r\n");
+                textBox1.AppendText(mode + "Ìí¼Ó³É¹¦£¡£¡£¡ºËĞÎ×´ÎªÎª£º" + open_operation.kernel_shape.ToString() +
+                    ",¿í¶ÈÎª£º" + open_operation.kernel_width.ToString() +
+                    ",¸ß¶ÈÎª£º" + open_operation.kernel_height.ToString() + "\r\n");
             }
         }
 
         /// <summary>
-        /// è†¨èƒ€
+        /// ÅòÕÍ
         /// </summary>
         /// <param name="mode"></param>
         /// <exception cref="NotImplementedException"></exception>
         private void Expansion(string mode)
         {
-            Morphological_operation expansion = new Morphological_operation("è†¨èƒ€");
+            Morphological_operation expansion = new Morphological_operation("ÅòÕÍ");
             expansion.StartPosition = FormStartPosition.CenterScreen;
             expansion.ShowDialog();
             if (expansion.DialogResult == DialogResult.OK)
@@ -429,20 +515,20 @@ namespace Image_processing
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.Expansion);
-                textBox1.AppendText(mode + "æ·»åŠ æˆåŠŸï¼ï¼ï¼æ ¸å½¢çŠ¶ä¸ºä¸ºï¼š" + expansion.kernel_shape.ToString() +
-                    ",å®½åº¦ä¸ºï¼š" + expansion.kernel_width.ToString() +
-                    ",é«˜åº¦ä¸ºï¼š" + expansion.kernel_height.ToString() + "\r\n");
+                textBox1.AppendText(mode + "Ìí¼Ó³É¹¦£¡£¡£¡ºËĞÎ×´ÎªÎª£º" + expansion.kernel_shape.ToString() +
+                    ",¿í¶ÈÎª£º" + expansion.kernel_width.ToString() +
+                    ",¸ß¶ÈÎª£º" + expansion.kernel_height.ToString() + "\r\n");
             }
         }
 
         /// <summary>
-        /// è…èš€æ“ä½œ
+        /// ¸¯Ê´²Ù×÷
         /// </summary>
         /// <param name="mode"></param>
         /// <exception cref="NotImplementedException"></exception>
         private void Corrosion(string mode)
         {
-            Morphological_operation corrosion = new Morphological_operation("è…èš€æ“ä½œ");
+            Morphological_operation corrosion = new Morphological_operation("¸¯Ê´²Ù×÷");
             corrosion.StartPosition = FormStartPosition.CenterScreen;
             corrosion.ShowDialog();
             if (corrosion.DialogResult == DialogResult.OK)
@@ -458,18 +544,18 @@ namespace Image_processing
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.Corrosion);
-                textBox1.AppendText(mode + "æ·»åŠ æˆåŠŸï¼ï¼ï¼æ ¸å½¢çŠ¶ä¸ºä¸ºï¼š" + corrosion.kernel_shape.ToString() +
-                    ",å®½åº¦ä¸ºï¼š" + corrosion.kernel_width.ToString() +
-                    ",é«˜åº¦ä¸ºï¼š" + corrosion.kernel_height.ToString() + "\r\n");
+                textBox1.AppendText(mode + "Ìí¼Ó³É¹¦£¡£¡£¡ºËĞÎ×´ÎªÎª£º" + corrosion.kernel_shape.ToString() +
+                    ",¿í¶ÈÎª£º" + corrosion.kernel_width.ToString() +
+                    ",¸ß¶ÈÎª£º" + corrosion.kernel_height.ToString() + "\r\n");
             }
         }
 
-        #endregion å½¢æ€å­¦æ“ä½œ
+        #endregion ĞÎÌ¬Ñ§²Ù×÷
 
-        #region å›¾åƒé˜ˆå€¼æ“ä½œ
+        #region Í¼ÏñãĞÖµ²Ù×÷
 
         /// <summary>
-        /// OTsuç®—æ³•
+        /// OTsuËã·¨
         /// </summary>
         /// <param name="mode"></param>
         /// <exception cref="NotImplementedException"></exception>
@@ -491,12 +577,12 @@ namespace Image_processing
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.Otsu);
-                textBox1.AppendText(mode + "æ·»åŠ æˆåŠŸï¼ï¼ï¼æ¨¡å¼ä¸ºï¼š" + otsu.Binarization_mode.ToString() + "\r\n");
+                textBox1.AppendText(mode + "Ìí¼Ó³É¹¦£¡£¡£¡Ä£Ê½Îª£º" + otsu.Binarization_mode.ToString() + "\r\n");
             }
         }
 
         /// <summary>
-        /// è‡ªé€‚åº”é˜ˆå€¼
+        /// ×ÔÊÊÓ¦ãĞÖµ
         /// </summary>
         /// <param name="mode"></param>
         private void AdaptiveThreshold(string mode)
@@ -518,19 +604,19 @@ namespace Image_processing
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.AdaptiveThreshold);
-                textBox1.AppendText(mode + "æ·»åŠ æˆåŠŸï¼ï¼ï¼è‡ªé€‚åº”é˜ˆå€¼ç®—æ³•ä¸ºï¼š" + adaptivethreshold.Adaptive_Types.ToString() +
-                    ",æ¨¡å¼ä¸ºï¼š" + adaptivethreshold.Threshold_Types.ToString() + "\r\n");
+                textBox1.AppendText(mode + "Ìí¼Ó³É¹¦£¡£¡£¡×ÔÊÊÓ¦ãĞÖµËã·¨Îª£º" + adaptivethreshold.Adaptive_Types.ToString() +
+                    ",Ä£Ê½Îª£º" + adaptivethreshold.Threshold_Types.ToString() + "\r\n");
             }
         }
 
         /// <summary>
-        /// äºŒå€¼åŒ–
+        /// ¶şÖµ»¯
         /// </summary>
         /// <param name="mode"></param>
         /// <exception cref="NotImplementedException"></exception>
         private void Binarizate(string mode)
         {
-            Binarization binarization = new Binarization("äºŒå€¼åŒ–");
+            Binarization binarization = new Binarization("¶şÖµ»¯");
             binarization.StartPosition = FormStartPosition.CenterScreen;
             binarization.ShowDialog();
             if (binarization.DialogResult == DialogResult.OK)
@@ -547,17 +633,17 @@ namespace Image_processing
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.ToBinary);
-                textBox1.AppendText(mode + "æ·»åŠ æˆåŠŸï¼ï¼ï¼é˜ˆå€¼ä¸ºï¼š" + binarization.Threshold.ToString() +
-                    ",æ¨¡å¼ä¸ºï¼š" + binarization.Binarization_mode.ToString() + "\r\n");
+                textBox1.AppendText(mode + "Ìí¼Ó³É¹¦£¡£¡£¡ãĞÖµÎª£º" + binarization.Threshold.ToString() +
+                    ",Ä£Ê½Îª£º" + binarization.Binarization_mode.ToString() + "\r\n");
             }
         }
 
-        #endregion å›¾åƒé˜ˆå€¼æ“ä½œ
+        #endregion Í¼ÏñãĞÖµ²Ù×÷
 
-        #region å›¾åƒç¿»è½¬
+        #region Í¼Ïñ·­×ª
 
         /// <summary>
-        /// ä¸Šä¸‹å·¦å³éƒ½ç¿»è½¬
+        /// ÉÏÏÂ×óÓÒ¶¼·­×ª
         /// </summary>
         /// <param name="mode"></param>
         /// <exception cref="NotImplementedException"></exception>
@@ -576,7 +662,7 @@ namespace Image_processing
         }
 
         /// <summary>
-        /// å·¦å³ç¿»è½¬
+        /// ×óÓÒ·­×ª
         /// </summary>
         /// <param name="mode"></param>
         /// <exception cref="NotImplementedException"></exception>
@@ -594,7 +680,7 @@ namespace Image_processing
         }
 
         /// <summary>
-        /// ä¸Šä¸‹ç¿»è½¬
+        /// ÉÏÏÂ·­×ª
         /// </summary>
         /// <param name="mode"></param>
         /// <exception cref="NotImplementedException"></exception>
@@ -611,12 +697,12 @@ namespace Image_processing
             textBox1.AppendText(mode + "\r\n");
         }
 
-        #endregion å›¾åƒç¿»è½¬
+        #endregion Í¼Ïñ·­×ª
 
-        #region æ»¤æ³¢
+        #region ÂË²¨
 
         /// <summary>
-        /// åŒè¾¹æ»¤æ³¢
+        /// Ë«±ßÂË²¨
         /// </summary>
         /// <param name="v"></param>
         /// <exception cref="NotImplementedException"></exception>
@@ -640,18 +726,18 @@ namespace Image_processing
                 listBox1.Items.Add(mode);
                 del_process Bilateral_Filter = OpenCV.Bilateral_Filter;
                 link.AddDelegate(Bilateral_Filter);
-                textBox1.AppendText(mode + "æ·»åŠ æˆåŠŸï¼ï¼ï¼sigmaColorä¸ºï¼š" + bilateral_Filter.SigmaColor.ToString() +
-                    ",SigmaSpaceï¼š" + bilateral_Filter.SigmaSpace.ToString() + "\r\n");
+                textBox1.AppendText(mode + "Ìí¼Ó³É¹¦£¡£¡£¡sigmaColorÎª£º" + bilateral_Filter.SigmaColor.ToString() +
+                    ",SigmaSpace£º" + bilateral_Filter.SigmaSpace.ToString() + "\r\n");
             }
         }
 
         /// <summary>
-        /// ä¸­å€¼æ»¤æ³¢
+        /// ÖĞÖµÂË²¨
         /// </summary>
         /// <param name="v"></param>
         private void Median_Blur(string mode)
         {
-            Filtering median_Blur = new Filtering(Filtering.æ¨¡å¼.å¥‡æ•°, new Filtering.Scope { min = 1, max = 50 }, mode);
+            Filtering median_Blur = new Filtering(Filtering.Ä£Ê½.ÆæÊı, new Filtering.Scope { min = 1, max = 50 }, mode);
             median_Blur.StartPosition = FormStartPosition.CenterScreen;
             median_Blur.ShowDialog();
             if (median_Blur.DialogResult == DialogResult.OK)
@@ -664,16 +750,16 @@ namespace Image_processing
 
                 listBox1.Items.Add(mode);
                 link.AddDelegate(OpenCV.Median_Blur);
-                textBox1.AppendText(mode + "æ·»åŠ æˆåŠŸï¼ï¼ï¼æ ¸å¤§å°ä¸ºï¼š" + median_Blur.Value.ToString() + "\r\n");
+                textBox1.AppendText(mode + "Ìí¼Ó³É¹¦£¡£¡£¡ºË´óĞ¡Îª£º" + median_Blur.Value.ToString() + "\r\n");
             }
         }
 
         /// <summary>
-        /// å‡å€¼æ»¤æ³¢
+        /// ¾ùÖµÂË²¨
         /// </summary>
         private void Mean_Filter(string mode)
         {
-            Filtering mean_filter = new Filtering(Filtering.æ¨¡å¼.å¥‡æ•°, new Filtering.Scope { min = 1, max = 50 }, mode);
+            Filtering mean_filter = new Filtering(Filtering.Ä£Ê½.ÆæÊı, new Filtering.Scope { min = 1, max = 50 }, mode);
             mean_filter.StartPosition = FormStartPosition.CenterScreen;
             mean_filter.ShowDialog();
             if (mean_filter.DialogResult == DialogResult.OK)
@@ -687,17 +773,17 @@ namespace Image_processing
                 listBox1.Items.Add(mode);
                 del_process medianBlur = OpenCV.medianBlur;
                 link.AddDelegate(medianBlur);
-                textBox1.AppendText(mode + "æ·»åŠ æˆåŠŸï¼ï¼ï¼æ ¸å¤§å°ä¸ºï¼š" + mean_filter.Value.ToString() + "\r\n");
+                textBox1.AppendText(mode + "Ìí¼Ó³É¹¦£¡£¡£¡ºË´óĞ¡Îª£º" + mean_filter.Value.ToString() + "\r\n");
             }
         }
 
         /// <summary>
-        /// æ–¹æ¡†æ»¤æ³¢
+        /// ·½¿òÂË²¨
         /// </summary>
         /// <param name="mode"></param>
         private void Box_Filter(string mode)
         {
-            Filtering box_filter = new Filtering(Filtering.æ¨¡å¼.æ— , new Filtering.Scope { min = 1, max = 50 }, mode);
+            Filtering box_filter = new Filtering(Filtering.Ä£Ê½.ÎŞ, new Filtering.Scope { min = 1, max = 50 }, mode);
             box_filter.StartPosition = FormStartPosition.CenterScreen;
             box_filter.ShowDialog();
             if (box_filter.DialogResult == DialogResult.OK)
@@ -711,18 +797,18 @@ namespace Image_processing
                 listBox1.Items.Add(mode);
                 del_process boxFilter = OpenCV.boxFilter;
                 link.AddDelegate(boxFilter);
-                textBox1.AppendText(mode + "æ·»åŠ æˆåŠŸï¼ï¼ï¼æ ¸å¤§å°ä¸ºï¼š" + box_filter.Value.ToString() + "\r\n");
+                textBox1.AppendText(mode + "Ìí¼Ó³É¹¦£¡£¡£¡ºË´óĞ¡Îª£º" + box_filter.Value.ToString() + "\r\n");
             }
         }
 
         /// <summary>
-        /// é«˜æ–¯æ»¤æ³¢
+        /// ¸ßË¹ÂË²¨
         /// </summary>
         /// <param name="v"></param>
         /// <exception cref="NotImplementedException"></exception>
         private void Gaussian_Blur(string mode)
         {
-            Filtering gaussian_Blur = new Filtering(Filtering.æ¨¡å¼.å¥‡æ•°, new Filtering.Scope { min = 1, max = 50 }, mode);
+            Filtering gaussian_Blur = new Filtering(Filtering.Ä£Ê½.ÆæÊı, new Filtering.Scope { min = 1, max = 50 }, mode);
             gaussian_Blur.StartPosition = FormStartPosition.CenterScreen;
             gaussian_Blur.ShowDialog();
             if (gaussian_Blur.DialogResult == DialogResult.OK)
@@ -736,16 +822,16 @@ namespace Image_processing
                 listBox1.Items.Add(mode);
                 del_process Gaussian_Blur = OpenCV.Gaussian_Blur;
                 link.AddDelegate(Gaussian_Blur);
-                textBox1.AppendText(mode + "æ·»åŠ æˆåŠŸï¼ï¼ï¼æ ¸å¤§å°ä¸ºï¼š" + gaussian_Blur.Value.ToString() + "\r\n");
+                textBox1.AppendText(mode + "Ìí¼Ó³É¹¦£¡£¡£¡ºË´óĞ¡Îª£º" + gaussian_Blur.Value.ToString() + "\r\n");
             }
         }
 
-        #endregion æ»¤æ³¢
+        #endregion ÂË²¨
 
-        #region é¢œè‰²ç©ºé—´å˜åŒ–
+        #region ÑÕÉ«¿Õ¼ä±ä»¯
 
         /// <summary>
-        /// é¢œè‰²å˜æ¢
+        /// ÑÕÉ«±ä»»
         /// </summary>
         ///
         private void color_add(string mode)
@@ -764,10 +850,10 @@ namespace Image_processing
                 del_process tocolor = OpenCV.colorto;
                 link.AddDelegate(tocolor);
 
-                textBox1.AppendText("é¢œè‰²ç©ºé—´å˜åŒ–æ·»åŠ æˆåŠŸï¼ï¼ï¼å›¾ç‰‡å¤„ç†ä¸ºï¼š" + colorto.ColorCode.ToString() + "\r\n");
+                textBox1.AppendText("ÑÕÉ«¿Õ¼ä±ä»¯Ìí¼Ó³É¹¦£¡£¡£¡Í¼Æ¬´¦ÀíÎª£º" + colorto.ColorCode.ToString() + "\r\n");
             }
         }
 
-        #endregion é¢œè‰²ç©ºé—´å˜åŒ–
+        #endregion ÑÕÉ«¿Õ¼ä±ä»¯
     }
 }

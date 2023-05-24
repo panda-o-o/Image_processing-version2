@@ -1,5 +1,6 @@
 ﻿using Image_processing.Class;
 using Image_processing.form;
+using Image_processing.form.Yolov5;
 using Image_processing.form.二值化;
 using Image_processing.form.平移旋转;
 using Image_processing.form.形态学操作;
@@ -7,6 +8,7 @@ using Image_processing.form.模板匹配;
 using Image_processing.form.滤波;
 using Image_processing.form.特征识别;
 using OpenCvSharp;
+using OpenCvSharp.Dnn;
 
 namespace Image_processing
 {
@@ -45,52 +47,132 @@ namespace Image_processing
                 case ("平移旋转"): change_translation_rotation("平移旋转", mode, index); break;
                 case ("模板匹配"): change_template_matching("模板匹配", mode, index); break;
                 case ("特征匹配"): change_feature_matching("特征匹配", mode, index); break;
+                case ("Yolov5"): change_Yolov5_matching("Yolov5", mode, index); break;
+                case ("Yolov5方框绘制"): change_Yolov5_Draw("Yolov5方框绘制", mode, index); break;
                 default:
                     // Handle the case where the element is not of any expected type
                     break;
             }
         }
 
+        private void change_Yolov5_Draw(string v, string mode, int index)
+        {
+            if (mode=="插入")
+            {
+                if (!listBox1.Items.Contains("Yolov5"))
+                {
+                    MessageBox.Show("请先添加Yolov5后，添加该操作");
+                    return;
+                }
+                var str = public_Environment.Yolov5_class.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+                public_Environment.Yolov5_list_class.AddRange(str);
+                Data_dic data = new();
+                data_List.Data_list.Add(data);
+                listBox1.Items.Add(v);
+                del_process Yolov5_Box_drawing = OpenCV.Yolov5_Box_drawing;
+                link.AddDelegate(Yolov5_Box_drawing);
+                textBox1.AppendText("Yolov5检测边框绘制");
+            }
+        }
+
+        private void change_Yolov5_matching(string v, string mode, int index)
+        {
+            Yolov5 yolov5 = new Yolov5(v, mode, index);
+            yolov5.StartPosition = FormStartPosition.CenterScreen;
+            yolov5.ShowDialog();
+            if (yolov5.DialogResult == DialogResult.OK)
+            {
+                if (mode == "修改")
+                {
+                    var onnx_path = yolov5.Onnx_path;
+                    var Net = CvDnn.ReadNetFromOnnx(onnx_path);
+                    Net.SetPreferableBackend(Backend.DEFAULT);
+                    Net.SetPreferableTarget(Target.CPU);
+                    data_List.Data_list[index].str_dic["onnx_path"] = yolov5.Onnx_path;
+                    data_List.Data_list[index].flo_dic["Input_width"] = yolov5.Input_width;
+                    data_List.Data_list[index].flo_dic["Input_height"] = yolov5.Input_height;
+                    data_List.Data_list[index].flo_dic["Score_threshold"] = yolov5.Score_threshold;
+                    data_List.Data_list[index].flo_dic["Nms_threshold"] = yolov5.Nms_threshold;
+                    data_List.Data_list[index].flo_dic["Confidence_threshold"] = yolov5.Confidence_threshold;
+                    data_List.Data_list[index].net_dic["Net"] = Net;
+                }
+                else if (mode == "插入")
+                {
+                    var onnx_path = yolov5.Onnx_path;
+                    var Net = CvDnn.ReadNetFromOnnx(onnx_path);
+                    Net.SetPreferableBackend(Backend.DEFAULT);
+                    Net.SetPreferableTarget(Target.CPU);
+                    Data_dic data = new()
+                    {
+                        flo_dic = new Dictionary<string, float>()
+                    {
+                        { "Input_width" , yolov5.Input_width},
+                        { "Input_height" ,yolov5.Input_height },
+                        { "Score_threshold" ,yolov5.Score_threshold },
+                        { "Nms_threshold" ,yolov5.Nms_threshold },
+                        { "Confidence_threshold",yolov5.Confidence_threshold }
+                    },
+                        str_dic = new Dictionary<string, string>()
+                    {
+                        {"class_path",yolov5.Class_path },
+                        {"onnx_path",yolov5.Onnx_path }
+                    },
+                        net_dic = new Dictionary<string, Net>()
+                    {
+                        {"Net",Net }
+                    }
+                    };
+                    public_Environment.Yolov5_class = yolov5.Class_list;
+                    data_List.Data_list.Add(data);
+                }
+            }
+            textBox1.AppendText(v + mode+"成功！！！类别得分阈值为：" + yolov5.Score_threshold +
+                    "非极大值抑制阈值：" + yolov5.Nms_threshold + "，置信度阈值为：" + yolov5.Confidence_threshold + "\r\n");
+        }
+
         private void change_feature_matching(string v, string mode, int index)
         {
-            Feature feature_Matching = new Feature("特征匹配", mode, index);
+            Feature feature_Matching = new Feature(v, mode, index);
             // 创建特征匹配窗口对象
             feature_Matching.StartPosition = FormStartPosition.CenterScreen;
             // 设置窗口的起始位置为屏幕中央
             feature_Matching.ShowDialog();
             // 显示特征匹配窗口
-            if (mode == "修改")
-            // 如果是修改操作
+            if (feature_Matching.DialogResult==DialogResult.OK)
             {
-                data_List.Data_list[index].mat_dic["Template"] = feature_Matching.Template;
-                // 将特征匹配窗口中选择的模板图像保存到数据列表中
-                data_List.Data_list[index].mat_dic["desc2"] = feature_Matching.desc2;
-                // 将特征匹配窗口中计算得到的特征描述子保存到数据列表中
-                data_List.Data_list[index].dou_dic["Threshold"] = feature_Matching.Threshold;
-                // 将特征匹配窗口中选择的阈值保存到数据列表中
-                data_List.Data_list[index].KeyPoint_dic["kp2"] = feature_Matching.kp2;
-                // 将特征匹配窗口中计算得到的特征点保存到数据列表中
-                data_List.Data_list[index].str_dic["mode"] = feature_Matching.Mode;
-                // 将特征匹配窗口中选择的匹配模式保存到数据列表中
-            }
-            else if (mode == "插入")
-            // 如果是插入操作
-            {
-                Data_dic data = new Data_dic
+                if (mode == "修改")
+                // 如果是修改操作
                 {
-                    dou_dic = new Dictionary<string, double>() { { "Threshold", feature_Matching.Threshold } },
-                    int_dic = new Dictionary<string, int>() { { "HessianThreshold", feature_Matching.HessianThreshold } },
-                    str_dic = new Dictionary<string, string>() { { "mode", feature_Matching.Mode } },
-                    KeyPoint_dic = new Dictionary<string, KeyPoint[]> { { "kp2", feature_Matching.kp2 } },
-                    mat_dic = new Dictionary<string, Mat>
-        {
-            { "desc2", feature_Matching.desc2 },
-            { "Template", feature_Matching.Template }
-        }
-                };
-                // 创建一个新的 Data_dic 对象，保存特征匹配窗口中选择的参数
-                data_List.Data_list.Insert(index, data);
-                // 将新的 Data_dic 对象插入到数据列表中
+                    data_List.Data_list[index].mat_dic["Template"] = feature_Matching.Template;
+                    // 将特征匹配窗口中选择的模板图像保存到数据列表中
+                    data_List.Data_list[index].mat_dic["desc2"] = feature_Matching.desc2;
+                    // 将特征匹配窗口中计算得到的特征描述子保存到数据列表中
+                    data_List.Data_list[index].dou_dic["Threshold"] = feature_Matching.Threshold;
+                    // 将特征匹配窗口中选择的阈值保存到数据列表中
+                    data_List.Data_list[index].KeyPoint_dic["kp2"] = feature_Matching.kp2;
+                    // 将特征匹配窗口中计算得到的特征点保存到数据列表中
+                    data_List.Data_list[index].str_dic["mode"] = feature_Matching.Mode;
+                    // 将特征匹配窗口中选择的匹配模式保存到数据列表中
+                }
+                else if (mode == "插入")
+                // 如果是插入操作
+                {
+                    Data_dic data = new Data_dic
+                    {
+                        dou_dic = new Dictionary<string, double>() { { "Threshold", feature_Matching.Threshold } },
+                        int_dic = new Dictionary<string, int>() { { "HessianThreshold", feature_Matching.HessianThreshold } },
+                        str_dic = new Dictionary<string, string>() { { "mode", feature_Matching.Mode } },
+                        KeyPoint_dic = new Dictionary<string, KeyPoint[]> { { "kp2", feature_Matching.kp2 } },
+                        mat_dic = new Dictionary<string, Mat>
+                        {
+                            { "desc2", feature_Matching.desc2 },
+                            { "Template", feature_Matching.Template }
+                        }
+                    };
+                    // 创建一个新的 Data_dic 对象，保存特征匹配窗口中选择的参数
+                    data_List.Data_list.Insert(index, data);
+                    // 将新的 Data_dic 对象插入到数据列表中
+                }
             }
             textBox1.AppendText(v + mode + "成功！！！模式为：" + feature_Matching.Mode +
                     "模板为：" + feature_Matching.Pic_name + "，阈值为：" + feature_Matching.Threshold + "\r\n");
@@ -99,7 +181,7 @@ namespace Image_processing
 
         private void change_template_matching(string v, string mode, int index)
         {
-            Template_Matching template_Matching = new Template_Matching("模板匹配", mode, index);
+            Template_Matching template_Matching = new Template_Matching(v, mode, index);
             // 创建模板匹配窗口对象
             template_Matching.StartPosition = FormStartPosition.CenterScreen;
             // 设置窗口的起始位置为屏幕中央
@@ -822,7 +904,7 @@ namespace Image_processing
                 {
                     // 插入新的数据项
                     Data_dic data = new Data_dic();
-                    data.int_dic = new Dictionary<string,int>() { { "size", box_filter.Value } };
+                    data.int_dic = new Dictionary<string, int>() { { "size", box_filter.Value } };
                     data_List.Data_list.Insert(index, data);
                 }
                 // 添加操作成功提示信息到文本框中

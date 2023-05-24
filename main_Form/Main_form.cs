@@ -21,9 +21,10 @@ namespace Image_processing
         public static Data_List? data_List;
         private bool camera_open = false;
         private VideoCapture? VideoCapture;
-        private Dictionary<string, del_process> Delegation_Deserialization;
-        private Dictionary<del_process, string> Delegation_Serialization;
-        private NotifyIcon notifyIcon;
+        private PictureBox pictureBox = new();//用于处理图片播放，以及放大
+        private readonly Dictionary<string, del_process> Delegation_Deserialization;
+        private readonly Dictionary<del_process, string> Delegation_Serialization;
+        public static Public_Environment? public_Environment;
 
 
         #region 窗体加载
@@ -37,6 +38,8 @@ namespace Image_processing
             mask = new Mat();
             mat = new Mat();
             data_List = new Data_List();
+            public_Environment = new Public_Environment();
+            pictureBox = pictureBox_small;
             Delegation_Deserialization = new Dictionary<string, del_process>()
             {
                 {"colorto", OpenCV.colorto},
@@ -60,13 +63,11 @@ namespace Image_processing
                 {"Black_hat_operation", OpenCV.Black_hat_operation},
                 {"Translation_rotation", OpenCV.Translation_rotation},
                 {"Template_Match", OpenCV.Template_Match},
-                {"Feature_Matching", OpenCV.Feature_Matching}
+                {"Feature_Matching", OpenCV.Feature_Matching},
+                { "Yolov5",OpenCV.Yolov5_Detect },
+                { "Yolov5方框绘制",OpenCV.Yolov5_Box_drawing }
             };
             Delegation_Serialization = Delegation_Deserialization.ToDictionary(pair => pair.Value, pair => pair.Key);
-            notifyIcon = new NotifyIcon();
-            notifyIcon.Icon = Resource1.摄像机; // 加载资源文件中的图标
-            notifyIcon.Visible = true;
-            notifyIcon.Text = "OpenCVSharp";
             this.Icon = Resource1.摄像机; // 加载资源文件中的图标
         }
 
@@ -124,10 +125,12 @@ namespace Image_processing
             openFileDialog.RestoreDirectory = false;
             //设置是否允许多选
             openFileDialog.Multiselect = false;
-            //默认打开路径
+            //默认打开路径 
             //openFileDialog.InitialDirectory = @"F:\user\Pictures\Saved Pictures";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
+                GC.Collect();
+                camera_open = false;
                 if (VideoCapture != null)
                 {
                     VideoCapture.Dispose();
@@ -142,12 +145,13 @@ namespace Image_processing
                 if (ext == ".mp4" || ext == ".avi" || ext == ".mov")
                 {
                     VideoCapture = new VideoCapture(path);
-
+                    camera_open = true;
                     if (timer1.Enabled)
                     { timer1.Stop(); }
                     if (timer2.Enabled)
                     { timer2.Stop(); }
                     timer1.Interval = 1000 / 30;
+                    timer2.Interval = 1000 / 1;
                     timer1.Start();
                 }
                 else
@@ -210,7 +214,7 @@ namespace Image_processing
                                 #endregion 图片类型
                         }
                         MessageBox.Show("保存路径：" + fileName, "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        pictureBox1.Image.Save(fileName, imgformat);
+                        pictureBox_small.Image.Save(fileName, imgformat);
                     }
                 }
             }
@@ -377,9 +381,9 @@ namespace Image_processing
                     // 计数器，用于记录处理的帧数
                     link.InvokeDelegates(ref mat, ref mask, ref count);
                     // 调用链路处理函数对图像进行处理
-                    pictureBox1.Image?.Dispose();
+                    pictureBox.Image?.Dispose();
                     // 释放原始图片的资源
-                    pictureBox1.Image = OpenCV.GetMat(mat);
+                    pictureBox.Image = OpenCV.GetMat(mat);
                     // 将处理后的图像显示在 PictureBox 控件中
                     double time = sw.ElapsedMilliseconds;
                     // 计算处理时间
@@ -404,6 +408,7 @@ namespace Image_processing
             else
             // 如果已打开相机
             {
+                timer1.Stop();
                 timer2.Start();
                 // 启动计时器 timer2，开始从视频流中读取图像并进行处理
             }
@@ -413,6 +418,7 @@ namespace Image_processing
         {
             using (var frame = new Mat())
             {
+                if (VideoCapture == null) { return; }
                 VideoCapture.Read(frame);
                 if (!frame.Empty())
                 {
@@ -421,13 +427,14 @@ namespace Image_processing
                 }
             }
         }
-
+        int Number_of_runs = 0;
         private void timer2_Tick(object sender, EventArgs e)
         // 定时器触发事件
         {
             using (var frame = new Mat())
             // 创建一个 Mat 对象 frame，用于存储视频帧图像
             {
+                if (VideoCapture == null) { return; }
                 VideoCapture.Read(frame);
                 // 从视频流中读取一帧图像，存储到 frame 中
                 if (!frame.Empty())
@@ -440,14 +447,20 @@ namespace Image_processing
                     if (link.InvokeDelegates(ref img, ref mask, ref count))
                     // 调用链路处理函数对图像进行处理
                     {
-                        pictureBox1.Image?.Dispose();
+                        Number_of_runs++;
+                        pictureBox.Image?.Dispose();
                         // 释放原始图片的资源
-                        pictureBox1.Image = OpenCV.GetMat(img);
+                        pictureBox.Image = OpenCV.GetMat(img);
                         // 将处理后的图像显示在 PictureBox 控件中
                         img.Dispose();
                         // 释放 Mat 对象的资源
                         img = null;
                         // 将 Mat 对象设置为 null，方便垃圾回收器回收资源
+                        if (Number_of_runs >= 10)
+                        {
+                            GC.Collect();
+                            Number_of_runs = 0;
+                        }
                     }
                     else
                     {
@@ -463,7 +476,7 @@ namespace Image_processing
 
         private void 查看图片信息ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Image img = pictureBox1.Image;
+            Image img = pictureBox_small.Image;
             if (img != null)//需要判断图片是否为空，已经是否被实例化
             {
                 Mat mat = OpenCvSharp.Extensions.BitmapConverter.ToMat((Bitmap)img);
@@ -474,7 +487,7 @@ namespace Image_processing
 
         private enum Graphics_
         {
-            矩形, 直线, 圆
+            无, 矩形, 直线, 圆
         }
 
         private Graphics_ shape;
@@ -496,9 +509,9 @@ namespace Image_processing
             if (mat.Width > mat.Height)
             // 如果图片的宽度大于高度
             {
-                float a = pictureBox1.Width / (float)mat.Width;
+                float a = pictureBox_small.Width / (float)mat.Width;
                 // 计算控件宽度与图片宽度的比例
-                pic_y = (e.Y - (pictureBox1.Height - (float)mat.Height * a) / 2) * 1 / a;
+                pic_y = (e.Y - (pictureBox_small.Height - (float)mat.Height * a) / 2) * 1 / a;
                 // 计算图片在控件中的纵坐标
                 pic_x = e.X * 1 / a;
                 // 计算图片在控件中的横坐标
@@ -506,9 +519,9 @@ namespace Image_processing
             else
             // 如果图片的高度大于宽度
             {
-                float a = pictureBox1.Height / (float)mat.Height;
+                float a = pictureBox_small.Height / (float)mat.Height;
                 // 计算控件高度与图片高度的比例
-                pic_x = (e.X - (pictureBox1.Width - (float)mat.Width * a) / 2) * 1 / a;
+                pic_x = (e.X - (pictureBox_small.Width - (float)mat.Width * a) / 2) * 1 / a;
                 // 计算图片在控件中的横坐标
                 pic_y = e.Y * 1 / a;
                 // 计算图片在控件中的纵坐标
@@ -521,7 +534,10 @@ namespace Image_processing
         {
             shape = Graphics_.矩形;
         }
-
+        private void 无ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            shape = Graphics_.无;
+        }
         private void 直线绘制ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             shape = Graphics_.直线;
@@ -529,79 +545,84 @@ namespace Image_processing
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
-            Image img = pictureBox1.Image;
-            // 获取 PictureBox 控件中的图片
-            if (img != null)
-            // 如果图片不为空
+            if (camera_open == false)
             {
-                if (e.Button == MouseButtons.Left)
-                // 如果鼠标左键被点击
+                Image img = pictureBox_small.Image;
+                // 获取 PictureBox 控件中的图片
+                if (img != null)
+                // 如果图片不为空
                 {
-                    mouseDown = true;
-                    // 设置鼠标左键被按下的标志
-                    Mat mat = OpenCvSharp.Extensions.BitmapConverter.ToMat((Bitmap)img);
-                    // 将图片转换为 OpenCV 的 Mat 格式
-                    Point location = new Point();
-                    location = True_coordinate_calculation(e, mat);
-                    // 将鼠标点击的坐标转换为图片上的真实坐标
-                    if (location.X < 0 || location.Y < 0 || location.X > mat.Width || location.Y > mat.Height)
-                    // 如果点击位置不在图片范围之内
+                    if (e.Button == MouseButtons.Left)
+                    // 如果鼠标左键被点击
                     {
-                        return;
+                        mouseDown = true;
+                        // 设置鼠标左键被按下的标志
+                        Mat mat = OpenCvSharp.Extensions.BitmapConverter.ToMat((Bitmap)img);
+                        // 将图片转换为 OpenCV 的 Mat 格式
+                        Point location = new Point();
+                        location = True_coordinate_calculation(e, mat);
+                        // 将鼠标点击的坐标转换为图片上的真实坐标
+                        if (location.X < 0 || location.Y < 0 || location.X > mat.Width || location.Y > mat.Height)
+                        // 如果点击位置不在图片范围之内
+                        {
+                            return;
+                        }
+                        ptStart = True_coordinate_calculation(e, mat);
+                        // 将鼠标点击的坐标转换为图片上的真实坐标，作为绘制图形时的起点
+                        Vec3b bgr = mat.At<Vec3b>(ptStart.Y, ptStart.X);
+                        // 获取鼠标点击位置的像素颜色信息
+                        byte blue = bgr[0];   // 蓝色通道值
+                        byte green = bgr[1];  // 绿色通道值
+                        byte red = bgr[2];    // 红色通道值
+                        toolStripStatusLabel1.Text = "红色通道值：" + red + "，绿色通道值：" + green + "，蓝色通道值：" + blue;
+                        // 在状态栏中显示该像素的 RGB 值
+                        mat.Dispose();
+                        // 释放 Mat 对象的资源
+                        mat = null;
+                        // 将 Mat 对象设置为 null，方便垃圾回收器回收资源
+                        GC.Collect();
+                        // 手动调用垃圾回收，回收不再使用的资源
                     }
-                    ptStart = True_coordinate_calculation(e, mat);
-                    // 将鼠标点击的坐标转换为图片上的真实坐标，作为绘制图形时的起点
-                    Vec3b bgr = mat.At<Vec3b>(ptStart.Y, ptStart.X);
-                    // 获取鼠标点击位置的像素颜色信息
-                    byte blue = bgr[0];   // 蓝色通道值
-                    byte green = bgr[1];  // 绿色通道值
-                    byte red = bgr[2];    // 红色通道值
-                    toolStripStatusLabel1.Text = "红色通道值：" + red + "，绿色通道值：" + green + "，蓝色通道值：" + blue;
-                    // 在状态栏中显示该像素的 RGB 值
-                    mat.Dispose();
-                    // 释放 Mat 对象的资源
-                    mat = null;
-                    // 将 Mat 对象设置为 null，方便垃圾回收器回收资源
-                    GC.Collect();
-                    // 手动调用垃圾回收，回收不再使用的资源
                 }
             }
         }
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (mouseDown)
-            // 如果鼠标左键被按下
+            if (camera_open == false)
             {
-                if (e.Button == MouseButtons.Left)
-                // 如果鼠标左键被点击
+                if (mouseDown)
+                // 如果鼠标左键被按下
                 {
-
-                    Mat mat = Main_form.mat.Clone();
-                    // 将原始图像拷贝一份，用于绘制图形
-                    Point ptEnd = True_coordinate_calculation(e, mat);
-                    // 将鼠标点击的坐标转换为图片上的真实坐标
-                    if (shape == Graphics_.矩形)
-                    // 如果用户选择了绘制矩形
+                    if (e.Button == MouseButtons.Left)
+                    // 如果鼠标左键被点击
                     {
-                        Cv2.Rectangle(mat, ptStart, ptEnd, new Scalar(0, 0, 255), 2);
-                        // 在图片上绘制一个矩形，颜色为红色
+                        using Mat mat = Main_form.mat.Clone();
+                        // 将原始图像拷贝一份，用于绘制图形
+                        Point ptEnd = True_coordinate_calculation(e, mat);
+                        // 将鼠标点击的坐标转换为图片上的真实坐标
+                        if (shape == Graphics_.矩形)
+                        // 如果用户选择了绘制矩形
+                        {
+                            Cv2.Rectangle(mat, ptStart, ptEnd, new Scalar(0, 0, 255), 2);
+                            // 在图片上绘制一个矩形，颜色为红色
+                        }
+                        else if (shape == Graphics_.直线)
+                        // 如果用户选择了绘制直线
+                        {
+                            Cv2.Line(mat, ptStart, ptEnd, new Scalar(0, 0, 255), 2);
+                            // 在图片上绘制一条直线，颜色为红色
+                            int distance = (int)Math.Sqrt(Math.Pow(ptEnd.X - ptStart.X, 2) + Math.Pow(ptEnd.Y - ptStart.Y, 2));
+                            // 计算绘制的直线的两个端点之间的距离
+                            toolStripStatusLabel1.Text = "两点距离为：" + distance;
+                            // 在状态栏上显示距离信息
+                        }
+                        pictureBox_small.Image?.Dispose();
+                        // 释放原始图片的资源
+                        pictureBox_small.Image = OpenCV.GetMat(mat);
+                        // 将绘制好的图片显示在 PictureBox 控件上
+                        GC.Collect();
+                        // 手动调用垃圾回收，回收不再使用的资源
                     }
-                    else if (shape == Graphics_.直线)
-                    // 如果用户选择了绘制直线
-                    {
-                        Cv2.Line(mat, ptStart, ptEnd, new Scalar(0, 0, 255), 2);
-                        // 在图片上绘制一条直线，颜色为红色
-                        int distance = (int)Math.Sqrt(Math.Pow(ptEnd.X - ptStart.X, 2) + Math.Pow(ptEnd.Y - ptStart.Y, 2));
-                        // 计算绘制的直线的两个端点之间的距离
-                        toolStripStatusLabel1.Text = "两点距离为：" + distance;
-                        // 在状态栏上显示距离信息
-                    }
-                    pictureBox1.Image?.Dispose();
-                    // 释放原始图片的资源
-                    pictureBox1.Image = OpenCV.GetMat(mat);
-                    // 将绘制好的图片显示在 PictureBox 控件上
-                    GC.Collect();
-                    // 手动调用垃圾回收，回收不再使用的资源
                 }
             }
         }
@@ -631,6 +652,7 @@ namespace Image_processing
                     listBox1.Items.Remove(item);
                     textBox1.AppendText(list + "删除成功\r\n");
                 }
+                GC.Collect();
             }
         }
 
@@ -705,6 +727,36 @@ namespace Image_processing
             }
         }
 
+        private void pictureBox1_DoubleClick(object sender, EventArgs e)
+        {
+            // 创建一个新的窗口来显示所选图片的全屏版本（也可以使用对话框）
+            Form fullScreenForm = new Form();
+            fullScreenForm.WindowState = FormWindowState.Maximized;
+
+            // 设置新窗口的背景色
+            fullScreenForm.BackColor = Color.Black;
+            fullScreenForm.Icon = Resource1.放大;
+            // 创建一个 PictureBox 控件并添加到新窗口中
+            PictureBox pictureBox_big = new PictureBox();
+            
+            pictureBox_big.Dock = DockStyle.Fill;
+            pictureBox_big.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox_big.Image = pictureBox_small.Image;
+            pictureBox = pictureBox_big;
+
+            fullScreenForm.Controls.Add(pictureBox_big);
+
+            // 显示新窗口
+            fullScreenForm.ShowDialog();
+            pictureBox = pictureBox_small;
+            // 释放新窗口的资源
+            pictureBox_big.Dispose();
+            fullScreenForm.Dispose();
+        }
+
+
+
+
         #endregion ListBox
 
         #region tree
@@ -730,5 +782,6 @@ namespace Image_processing
         }
 
         #endregion tree
+
     }
 }
