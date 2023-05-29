@@ -26,7 +26,6 @@ namespace Image_processing
         private readonly Dictionary<del_process, string> Delegation_Serialization;
         public static Public_Environment? public_Environment;
 
-
         #region 窗体加载
 
         public Main_form()
@@ -629,12 +628,42 @@ namespace Image_processing
 
         private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
         {
+            
             if (e.Button == MouseButtons.Left)
             {
                 mouseDown = false;
             }
         }
 
+        private void pictureBox1_DoubleClick(object sender, EventArgs e)
+        {
+           
+            // 创建一个新的窗口来显示所选图片的全屏版本（也可以使用对话框）
+            Form fullScreenForm = new Form();
+            fullScreenForm.WindowState = FormWindowState.Maximized;
+
+            // 设置新窗口的背景色
+            fullScreenForm.BackColor = Color.Black;
+            fullScreenForm.Icon = Resource1.放大;
+            // 创建一个 PictureBox 控件并添加到新窗口中
+            PictureBox pictureBox_big = new PictureBox();
+
+            pictureBox_big.Dock = DockStyle.Fill;
+            pictureBox_big.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox_big.Image = pictureBox_small.Image;
+            pictureBox = pictureBox_big;
+
+            fullScreenForm.Controls.Add(pictureBox_big);
+
+            // 显示新窗口
+            fullScreenForm.ShowDialog();
+            pictureBox_small.Image = pictureBox_big.Image;
+            // 释放新窗口的资源
+            pictureBox_big.Dispose();
+            fullScreenForm.Dispose();
+            pictureBox = pictureBox_small;
+
+        }
         #endregion PictureBox
 
         #region ListBox
@@ -727,32 +756,7 @@ namespace Image_processing
             }
         }
 
-        private void pictureBox1_DoubleClick(object sender, EventArgs e)
-        {
-            // 创建一个新的窗口来显示所选图片的全屏版本（也可以使用对话框）
-            Form fullScreenForm = new Form();
-            fullScreenForm.WindowState = FormWindowState.Maximized;
 
-            // 设置新窗口的背景色
-            fullScreenForm.BackColor = Color.Black;
-            fullScreenForm.Icon = Resource1.放大;
-            // 创建一个 PictureBox 控件并添加到新窗口中
-            PictureBox pictureBox_big = new PictureBox();
-            
-            pictureBox_big.Dock = DockStyle.Fill;
-            pictureBox_big.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox_big.Image = pictureBox_small.Image;
-            pictureBox = pictureBox_big;
-
-            fullScreenForm.Controls.Add(pictureBox_big);
-
-            // 显示新窗口
-            fullScreenForm.ShowDialog();
-            pictureBox = pictureBox_small;
-            // 释放新窗口的资源
-            pictureBox_big.Dispose();
-            fullScreenForm.Dispose();
-        }
 
 
 
@@ -782,6 +786,5 @@ namespace Image_processing
         }
 
         #endregion tree
-
     }
 }
