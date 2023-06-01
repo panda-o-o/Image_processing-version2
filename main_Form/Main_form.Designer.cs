@@ -116,32 +116,33 @@
             // 
             pic_MenuStrip.Items.AddRange(new ToolStripItem[] { 无ToolStripMenuItem, 查看图片信息ToolStripMenuItem, 矩形绘制ToolStripMenuItem, 直线绘制ToolStripMenuItem });
             pic_MenuStrip.Name = "pic_MenuStrip";
-            pic_MenuStrip.Size = new Size(149, 92);
+            pic_MenuStrip.Size = new Size(181, 114);
             // 
             // 无ToolStripMenuItem
             // 
             无ToolStripMenuItem.Name = "无ToolStripMenuItem";
-            无ToolStripMenuItem.Size = new Size(148, 22);
+            无ToolStripMenuItem.Size = new Size(180, 22);
             无ToolStripMenuItem.Text = "无";
             无ToolStripMenuItem.Click += 无ToolStripMenuItem_Click;
             // 
             // 查看图片信息ToolStripMenuItem
             // 
             查看图片信息ToolStripMenuItem.Name = "查看图片信息ToolStripMenuItem";
-            查看图片信息ToolStripMenuItem.Size = new Size(148, 22);
+            查看图片信息ToolStripMenuItem.Size = new Size(180, 22);
             查看图片信息ToolStripMenuItem.Text = "查看图片信息";
+            查看图片信息ToolStripMenuItem.Click += 查看图片信息ToolStripMenuItem_Click;
             // 
             // 矩形绘制ToolStripMenuItem
             // 
             矩形绘制ToolStripMenuItem.Name = "矩形绘制ToolStripMenuItem";
-            矩形绘制ToolStripMenuItem.Size = new Size(148, 22);
+            矩形绘制ToolStripMenuItem.Size = new Size(180, 22);
             矩形绘制ToolStripMenuItem.Text = "矩形绘制";
             矩形绘制ToolStripMenuItem.Click += 矩形绘制ToolStripMenuItem_Click;
             // 
             // 直线绘制ToolStripMenuItem
             // 
             直线绘制ToolStripMenuItem.Name = "直线绘制ToolStripMenuItem";
-            直线绘制ToolStripMenuItem.Size = new Size(148, 22);
+            直线绘制ToolStripMenuItem.Size = new Size(180, 22);
             直线绘制ToolStripMenuItem.Text = "直线绘制";
             直线绘制ToolStripMenuItem.Click += 直线绘制ToolStripMenuItem_Click;
             // 

@@ -57,7 +57,7 @@ namespace Image_processing.Class
                 {
                     // 创建一个新的 Data_dic 对象
                     var data_dic = new Data_dic();
-
+                    bool 形态学处理 = false;
                     // 从 JObject 中读取 mat_dic 字典并遍历它
                     if (Data_dic["mat_dic"] is JObject mat_obj)
                     {
@@ -72,6 +72,10 @@ namespace Image_processing.Class
                                 Mat mat = Cv2.ImDecode(buf, ImreadModes.Color);
                                 // 将 Mat 对象添加到 mat_data 中的 data_dic 字典中
                                 data_dic.mat_dic.Add(str, mat);
+                                if (str== "Kernel")
+                                {
+                                    形态学处理 = true;
+                                }
                             }
                             catch (Exception)
                             {
@@ -115,13 +119,13 @@ namespace Image_processing.Class
                             {
                                 int value = item.Value.ToObject<int>();
                                 data_dic.int_dic.Add(item.Key, value);
-
                             }
-                            catch (Exception)
-                            {
-
-                            }
-
+                            catch (Exception){}
+                        }
+                        if (形态学处理==true)
+                        {
+                            data_dic.mat_dic["Kernel"]= Cv2.GetStructuringElement((MorphShapes)data_dic.int_dic["kernel_shape"], new OpenCvSharp.Size(data_dic.int_dic["kernel_width"], data_dic.int_dic["kernel_height"]));
+                            形态学处理 = false;
                         }
                     }
                     // 从 JObject 中读取 dou_dic 字典并遍历它

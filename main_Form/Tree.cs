@@ -183,7 +183,7 @@ namespace Image_processing
                 return;
             }
             var str = public_Environment.Yolov5_class.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-            public_Environment.Yolov5_list_class.AddRange( str);
+            public_Environment.Yolov5_list_class.AddRange(str);
             Data_dic data = new();
             data_List.Data_list.Add(data);
             listBox1.Items.Add(v);
@@ -197,7 +197,7 @@ namespace Image_processing
             Yolov5 yolov5 = new Yolov5();
             yolov5.StartPosition = FormStartPosition.CenterScreen;
             yolov5.ShowDialog();
-            if (yolov5.DialogResult==DialogResult.OK)
+            if (yolov5.DialogResult == DialogResult.OK)
             {
                 var onnx_path = yolov5.Onnx_path;
                 var Net = CvDnn.ReadNetFromOnnx(onnx_path);
@@ -216,9 +216,9 @@ namespace Image_processing
                     str_dic = new Dictionary<string, string>()
                     {
                         {"class_path",yolov5.Class_path },
-                        {"onnx_path",yolov5.Onnx_path } 
+                        {"onnx_path",yolov5.Onnx_path }
                     },
-                    net_dic=new Dictionary<string, Net>()
+                    net_dic = new Dictionary<string, Net>()
                     {
                         {"Net",Net }
                     }
@@ -364,6 +364,12 @@ namespace Image_processing
                     mat_dic = new Dictionary<string, Mat>()
                     {
                         { "Kernel", black_hat_operation.Kernel }
+                    },
+                    int_dic = new Dictionary<string, int>()
+                    {
+                        { "kernel_shape",(int)black_hat_operation.kernel_shape},
+                        { "kernel_width",black_hat_operation.kernel_width},
+                        { "kernel_height",(int)black_hat_operation.kernel_height},
                     }
                 };
                 data_List.Data_list.Add(data);
@@ -393,6 +399,12 @@ namespace Image_processing
                     mat_dic = new Dictionary<string, Mat>()
                     {
                         { "Kernel", top_hat_operation.Kernel }
+                    },
+                    int_dic = new Dictionary<string, int>()
+                    {
+                        { "kernel_shape",(int)top_hat_operation.kernel_shape},
+                        { "kernel_width",top_hat_operation.kernel_width},
+                        { "kernel_height",(int)top_hat_operation.kernel_height},
                     }
                 };
                 data_List.Data_list.Add(data);
@@ -422,6 +434,12 @@ namespace Image_processing
                     mat_dic = new Dictionary<string, Mat>()
                     {
                         { "Kernel", gradient_operation.Kernel }
+                    },
+                    int_dic = new Dictionary<string, int>()
+                    {
+                        { "kernel_shape",(int)gradient_operation.kernel_shape},
+                        { "kernel_width",gradient_operation.kernel_width},
+                        { "kernel_height",(int)gradient_operation.kernel_height},
                     }
                 };
                 data_List.Data_list.Add(data);
@@ -451,6 +469,12 @@ namespace Image_processing
                     mat_dic = new Dictionary<string, Mat>()
                     {
                         { "Kernel", close_operation.Kernel }
+                    },
+                    int_dic = new Dictionary<string, int>()
+                    {
+                        { "kernel_shape",(int)close_operation.kernel_shape},
+                        { "kernel_width",close_operation.kernel_width},
+                        { "kernel_height",(int)close_operation.kernel_height},
                     }
                 };
                 data_List.Data_list.Add(data);
@@ -480,6 +504,12 @@ namespace Image_processing
                     mat_dic = new Dictionary<string, Mat>()
                     {
                         { "Kernel", open_operation.Kernel }
+                    },
+                    int_dic = new Dictionary<string, int>()
+                    {
+                        { "kernel_shape",(int)open_operation.kernel_shape},
+                        { "kernel_width",open_operation.kernel_width},
+                        { "kernel_height",(int)open_operation.kernel_height},
                     }
                 };
                 data_List.Data_list.Add(data);
@@ -509,6 +539,12 @@ namespace Image_processing
                     mat_dic = new Dictionary<string, Mat>()
                     {
                         { "Kernel", expansion.Kernel }
+                    },
+                    int_dic = new Dictionary<string, int>()
+                    {
+                        { "kernel_shape",(int)expansion.kernel_shape},
+                        { "kernel_width",expansion.kernel_width},
+                        { "kernel_height",(int)expansion.kernel_height},
                     }
                 };
                 data_List.Data_list.Add(data);
@@ -538,6 +574,12 @@ namespace Image_processing
                     mat_dic = new Dictionary<string, Mat>()
                     {
                         { "Kernel", corrosion.Kernel }
+                    },
+                    int_dic = new Dictionary<string, int>()
+                    {
+                        { "kernel_shape",(int)corrosion.kernel_shape},
+                        { "kernel_width",corrosion.kernel_width},
+                        { "kernel_height",(int)corrosion.kernel_height},
                     }
                 };
                 data_List.Data_list.Add(data);
