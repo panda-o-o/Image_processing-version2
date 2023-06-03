@@ -542,7 +542,7 @@ namespace Image_processing
                 {
                     continue;
                 }
-                using Mat scores = new Mat(1, 80, MatType.CV_32FC1, detectionMat.Data + i * detectionMat.Cols * sizeof(float) + 5 * sizeof(float));
+                using Mat scores = new Mat(1, outputs.Size(2)-5, MatType.CV_32FC1, detectionMat.Data + i * detectionMat.Cols * sizeof(float) + 5 * sizeof(float));
                 Point class_id;
                 double max_class_score;
                 Cv2.MinMaxLoc(scores, out _, out max_class_score, out _, out class_id);
